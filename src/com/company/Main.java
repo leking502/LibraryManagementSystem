@@ -1,8 +1,19 @@
 package com.company;
-
+import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 public class Main {
 
-    public static void main(String[] args) {
-	// write your code here
+    public static void main(String[] args)
+    {
+        try
+        {
+            BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.osLookAndFeelDecorated;
+            org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper.launchBeautyEyeLNF();
+        }
+        catch(Exception e)
+        {
+            //TODO exception
+        }
+        LoginWindow loginWindow = new LoginWindow();
+        loginWindow.ShowWindow();
     }
 }
