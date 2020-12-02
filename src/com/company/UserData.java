@@ -9,22 +9,27 @@ import java.util.Hashtable;
 import java.util.List;
 
 public class UserData {
-    protected String userName;
-    protected String password;
-    protected List<Integer> bookOnLoan;
-    protected String borrowingCardPeriod;
+    private static UserData userData;
+    private String userName;
+    private String password;
+    private String bookOnLoan;
+    private String borrowingCardPeriod;
 
-
-    public static void main(String[] args) {
-
+    private UserData(String userName, String password, String bookOnLoan, String borrowingCardPeriod) {
+        this.userName = userName;
+        this.password = password;
+        this.bookOnLoan = bookOnLoan;
+        this.borrowingCardPeriod = borrowingCardPeriod;
     }
-    void test(){
-
+    public static UserData CreateUserDate(String userName, String password, String bookOnLoan, String borrowingCardPeriod){
+        if(userData == null)
+            return userData = new UserData(userName,password,bookOnLoan,borrowingCardPeriod);
+        return  userData;
     }
-}
-class AdminAccount extends UserData{
 
-
+    public static UserData GetUserDate(){return userData;}
+    public String GetName(){return userData.userName;}
+    public String GetPassword(){return userData.password;}
 }
 
 

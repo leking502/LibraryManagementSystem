@@ -80,9 +80,12 @@
                 <properties/>
                 <border type="none" title="全部图书"/>
                 <children>
-                  <component id="cd5da" class="javax.swing.JTable" binding="table1" default-binding="true">
+                  <component id="cd5da" class="javax.swing.JTable" binding="allBook">
                     <constraints/>
                     <properties/>
+                    <clientProperties>
+                      <html.disable class="java.lang.Boolean" value="false"/>
+                    </clientProperties>
                   </component>
                 </children>
               </scrollpane>
