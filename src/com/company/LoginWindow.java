@@ -20,7 +20,6 @@ public class LoginWindow {
         public void actionPerformed(ActionEvent e) {
             String account = textField1.getText();
             String password = String.valueOf(passwordField1.getPassword());
-
         }
     }
     public void ShowWindow() {
