@@ -69,7 +69,7 @@ public class MainWindow {
         if(Objects.equals(UserData.GetMainUserData().GetMainUserJurisdiction(), "管理员")){
             adminWelcome.setText(UserData.GetMainUserData().GetMainUserName()+"欢迎使用管理员功能");
         }
-        welcomeText.setText(UserData.GetMainUserData().GetMainUserName()+"\n欢迎使用图书管理系统");
+        welcomeText.setText(UserData.GetMainUserData().GetMainUserName()+"\n欢迎使用图书管理系统！");
         bookTotal.setText("藏书总量："+ BookData.GetBookTotal());
         sButton.addActionListener(new ActionListener() {
             @Override
@@ -132,7 +132,7 @@ public class MainWindow {
                     return;
                 }
                 JOptionPane.showMessageDialog(null,"删除了账号:"+tragetUserObject.toString());
-                for (Object[] objects : BorrowingData.GetBorrowingTable(tragetUserObject.toString())) {
+                for (Object[] objects : Objects.requireNonNull(BorrowingData.GetBorrowingTable(tragetUserObject.toString()))) {
                     BorrowingData.ReBorBook(objects[0].toString());
                 }
                 Data.DelUserData(tragetUserObject.toString());
@@ -146,8 +146,15 @@ public class MainWindow {
                     return;
                 }
                 JOptionPane.showMessageDialog(null,"删除了编号为:"+tragetBookObjectM.toString()+"的图书");
+                for(UserData userData : UserData.GetUserDataList()){
+                    for(Object[] objects : Objects.requireNonNull(BorrowingData.GetBorrowingTable(userData.GetUserName()))){
+                        if(objects[0] == tragetBookObjectM){
+                            BorrowingData.ReBorBook(objects[0].toString());
+                        }
+                    }
+                }
                 Data.DelBookData(tragetBookObjectM.toString());
-                UpdataAllBookTable();
+                UpdataAllTable();
             }
         });
         tableBookM.addMouseListener(new MouseAdapter() {
