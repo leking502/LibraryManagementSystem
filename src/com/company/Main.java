@@ -22,6 +22,9 @@ public class Main {
         //LoginWindow loginWindow = new LoginWindow();
         //loginWindow.ShowWindow();
         Data.LoadData();
+
+
+        UserData.CreateUserDate("admin","123","1","-1");
         MainWindow mainWindow = new MainWindow();
         mainWindow.ShowWindow();
 

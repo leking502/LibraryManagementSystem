@@ -18,28 +18,25 @@ public class BookData {
         this.borrowingSituation = borrowingSituation;
         this.lendingDate = lendingDate;
     }
-    public static void AddBook(String userName, String password, String bookOnLoan, String borrowingCardPeriod){
+    public static void AddBook(String bookNumber, String bookName, String borrowingSituation, String lendingDate){
         if(bookData == null){
             bookData = new ArrayList<>();
-            bookData.add(new BookData(userName,password,bookOnLoan,borrowingCardPeriod));
+            bookData.add(new BookData(bookNumber,bookName,borrowingSituation,lendingDate));
             return;
         }
-        bookData.add(new BookData(userName,password,bookOnLoan,borrowingCardPeriod));
+        bookData.add(new BookData(bookNumber,bookName,borrowingSituation,lendingDate));
     }
     public static Object[][] GetBookTable(){
         if(bookData == null){
             return null;
         }
-        if(bookDateTable == null){
-            Object[][] date = new Object[bookData.size()][size];
-            for (int i = 0 ; i < bookData.size();i++){
-                date[i][0] = bookData.get(i).bookNumber;
-                date[i][1] = bookData.get(i).bookName;
-                date[i][2] = bookData.get(i).borrowingSituation;
-                date[i][3] = bookData.get(i).lendingDate;
-            }
-            return bookDateTable = date;
+        Object[][] date = new Object[bookData.size()][size];
+        for (int i = 0 ; i < bookData.size();i++){
+            date[i][0] = bookData.get(i).bookNumber;
+            date[i][1] = bookData.get(i).bookName;
+            date[i][2] = bookData.get(i).borrowingSituation;
+            date[i][3] = bookData.get(i).lendingDate;
         }
-        return bookDateTable;
+        return bookDateTable = date;
     }
 }

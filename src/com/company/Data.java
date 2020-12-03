@@ -3,13 +3,15 @@ package com.company;
 import javax.management.openmbean.ArrayType;
 import javax.xml.transform.Result;
 import java.sql.*;
+import java.time.DateTimeException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Date;
 
 public class Data {
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    static final String DB_URL = "jdbc:mysql://localhost:3306/date?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    static final String DB_URL = "jdbc:mysql://localhost:3306/librarydata?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     static final String USER = "root";
     static final String PASS = "123456";
     static  public List<String[]> userDataList = new ArrayList<>();
@@ -29,16 +31,15 @@ public class Data {
 
             String userDataSQL;
             String bookDataSQL;
-            userDataSQL = "SELECT UserName, Password, BookOnLoan,BorrowingCardPeriod from userdata";
-            bookDataSQL = "SELECT BookNumber, BookName, BorrowingSituation,LendingDate from bookdate";
-            System.out.println(userDataSQL);
+            userDataSQL = "SELECT UserName, Password, Jurisdiction, BorrowingCardPeriod from userdata";
+            bookDataSQL = "SELECT BookNumber, BookName, BorrowingSituation,PublicationTime from bookdata";
             ResultSet rsUser = stmt.executeQuery(userDataSQL);
             //加载用户数据
             while(rsUser.next()){
                 // 通过字段检索
                 String userName  = rsUser.getString("UserName");
                 String passWorld = rsUser.getString("Password");
-                String bookOnLoan = rsUser.getString("BookOnLoan");
+                String bookOnLoan = rsUser.getString("Jurisdiction");
                 String borrowingCardPeriod = rsUser.getString("BorrowingCardPeriod");
 
                 // 输出数据
@@ -59,7 +60,7 @@ public class Data {
                 String bookNumber  = rsBook.getString("BookNumber");
                 String bookName = rsBook.getString("BookName");
                 String borrowingSituation = rsBook.getString("BorrowingSituation");
-                String lendingDate = rsBook.getString("LendingDate");
+                String lendingDate = rsBook.getString("PublicationTime");
                 // 输出数据
                 BookData.AddBook(bookNumber,bookName,borrowingSituation,lendingDate);
             }
@@ -72,6 +73,34 @@ public class Data {
             throwable.printStackTrace();
         } catch (ClassNotFoundException e) {
             System.out.println("找不到MySQL驱动!");
+            e.printStackTrace();
+        }
+    }
+    static void AddBookData(String bookName ,String publicationTime){
+        Date date = new Date();
+        int bookNumber = Math.abs ((bookName + publicationTime+date.toString()).hashCode());
+        Connection conn = null;
+        PreparedStatement pstmt;
+
+        try {
+            //调用DriverManager对象的getConnection()方法，获得一个Connection对象
+            conn = DriverManager.getConnection(DB_URL,USER,PASS);
+            //创建一个Statement对象
+
+
+            String bookInsSQL;
+            bookInsSQL = "insert into BookData (BookNumber,BookName,BorrowingSituation,PublicationTime) values(?,?,?,?)";
+            pstmt = conn.prepareStatement (bookInsSQL);
+            pstmt.setString(1, Integer.toString(bookNumber));
+            pstmt.setString(2, bookName);
+            pstmt.setString(3, "未借出");
+            pstmt.setString(4, publicationTime);
+            pstmt.executeUpdate();
+
+            BookData.AddBook(Integer.toString(bookNumber),bookName,"未借出",publicationTime);
+            pstmt.close();
+            conn.close();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
