@@ -2,6 +2,7 @@ package com.company;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class BookData {
     private static List<BookData> bookData;
@@ -25,6 +26,9 @@ public class BookData {
             return;
         }
         bookData.add(new BookData(bookNumber,bookName,borrowingSituation,lendingDate));
+    }
+    public static void DelBook(String bookNumber){
+        bookData.removeIf(bookData -> Objects.equals(bookData.bookNumber , bookNumber));
     }
     public static Object[][] GetBookTable(){
         if(bookData == null){

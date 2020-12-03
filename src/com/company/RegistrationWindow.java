@@ -19,10 +19,15 @@ public class RegistrationWindow {
             public void actionPerformed(ActionEvent e) {
                 String account = userName.getText();
                 String password = userPassword.getText();
-                if(account.trim() == "" || password.trim() == "")
+                if(account.trim() == "" || password.trim() == "" )
                     return;
+                if(Data.FindUser(account) != null){
+                    JOptionPane.showMessageDialog(null,"该账号已存在");
+                    return;
+                }
+                JOptionPane.showMessageDialog(null,"注册成功");
                 Data.AddUserData(account,password,"用户");
-                Dispose();
+                Data.FindUser(account);
                 MainWindow mainWindow = new MainWindow();
                 mainWindow.ShowWindow();
             }

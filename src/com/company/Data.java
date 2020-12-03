@@ -93,6 +93,7 @@ public class Data {
     }
     static void AddUserData(String userName ,String userPassword,String Jurisdiction){
         Connection conn = null;
+        int userNumber = Math.abs ((userName + userPassword).hashCode());
         PreparedStatement pstmt;
 
         try {
@@ -102,12 +103,13 @@ public class Data {
 
 
             String userInsSQL;
-            userInsSQL = "insert into userdata (UserName,Password,Jurisdiction,BorrowingCardPeriod) values(?,?,?,?)";
+            userInsSQL = "insert into userdata (UserNumber,UserName,Password,Jurisdiction,BorrowingCardPeriod) values(?,?,?,?,?)";
             pstmt = conn.prepareStatement (userInsSQL);
-            pstmt.setString(1,userName );
-            pstmt.setString(2, userPassword);
-            pstmt.setString(3, Jurisdiction);
-            pstmt.setString(4, "正常");
+            pstmt.setString(1,Integer.toString(userNumber) );
+            pstmt.setString(2,userName );
+            pstmt.setString(3, userPassword);
+            pstmt.setString(4, Jurisdiction);
+            pstmt.setString(5, "正常");
             pstmt.executeUpdate();
 
             UserData.AddUser(userName,userPassword,Jurisdiction,"正常");
@@ -117,6 +119,40 @@ public class Data {
             e.printStackTrace();
         }
     }
+    static  void DelBookData(String bookNumber){
+
+        String sql = "delete from bookdata where BookNumber='" + bookNumber + "'";
+        PreparedStatement pstmt;
+        try {
+            Connection conn = DriverManager.getConnection(DB_URL,USER,PASS);
+            pstmt = (PreparedStatement) conn.prepareStatement(sql);
+            pstmt.executeUpdate();
+
+            pstmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        BookData.DelBook(bookNumber);
+    }
+    static  void DelUserData(String userName){
+
+
+        String sql = "delete from userdata where UserName='" + userName + "'";
+        PreparedStatement pstmt;
+        try {
+            Connection conn = DriverManager.getConnection(DB_URL,USER,PASS);
+            pstmt = (PreparedStatement) conn.prepareStatement(sql);
+            pstmt.executeUpdate();
+
+            pstmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        UserData.DelUser(userName);
+    }
+
     static UserData FindUser(String name){
         for(int i = 0 ;i<UserData.GetUserDataList().size();i++){
             if(Objects.equals(UserData.GetUserDataList().get(i).GetUserName(), name)){
