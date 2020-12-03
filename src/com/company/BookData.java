@@ -19,6 +19,9 @@ public class BookData {
         this.borrowingSituation = borrowingSituation;
         this.lendingDate = lendingDate;
     }
+    public static int GetBookTotal(){
+        return bookDataList.size();
+    }
     public String GetBookNumber(){return bookNumber;}
     public String GetBookName(){return bookName;}
     public String GetLendingDate(){return lendingDate;}

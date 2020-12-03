@@ -8,13 +8,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 public class MainWindow {
+    private static JFrame frame;
     private JPanel panel1;
     private JTabbedPane tabbedPane1;
     private JButton sButton;
@@ -37,11 +35,20 @@ public class MainWindow {
     private JTextField textFieldBor;
     private JButton sBorBookButton;
     private JButton reBorButton;
+    private JLabel welcomeText;
+    private JLabel bookTotal;
+    private JLabel adminWelcome;
     private Object tragetBookObject;
     private Object tragetBookObjectM;
     private Object tragetUserObject;
     private Object tragetBorBookObject;
 
+    public void SetTargetNull(){
+        tragetBookObject = null;
+        tragetBookObjectM = null;
+        tragetUserObject = null;
+        tragetBorBookObject = null;
+    }
     public void UpdataAllTable(){
         BookTableUpdata("",allBook);
         UserTableUpdata("",userTable);
@@ -59,6 +66,11 @@ public class MainWindow {
         BookTableUpdata("",tableBookM);
         BorTableUpdata("",borTable);
 
+        if(Objects.equals(UserData.GetMainUserData().GetMainUserJurisdiction(), "管理员")){
+            adminWelcome.setText(UserData.GetMainUserData().GetMainUserName()+"欢迎使用管理员功能");
+        }
+        welcomeText.setText(UserData.GetMainUserData().GetMainUserName()+"\n欢迎使用图书管理系统");
+        bookTotal.setText("藏书总量："+ BookData.GetBookTotal());
         sButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -120,8 +132,11 @@ public class MainWindow {
                     return;
                 }
                 JOptionPane.showMessageDialog(null,"删除了账号:"+tragetUserObject.toString());
+                for (Object[] objects : BorrowingData.GetBorrowingTable(tragetUserObject.toString())) {
+                    BorrowingData.ReBorBook(objects[0].toString());
+                }
                 Data.DelUserData(tragetUserObject.toString());
-                UserTableUpdata("",userTable);
+                UpdataAllTable();
             }
         });
         delBookButtonM.addActionListener(new ActionListener() {
@@ -199,7 +214,9 @@ public class MainWindow {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setBounds(800,400,750,500);
+        frame.setResizable(false);
         frame.setVisible(true);
+        this.frame = frame;
     }
     void BookTableUpdata(String bookName,JTable table){
         String head[]=new String[] {"书本编号", "书本名称", "借阅状态", "出版时间"};
@@ -262,16 +279,17 @@ public class MainWindow {
         table.setModel(tableModel);
     }
     void BorTableUpdata(String bookName,JTable table){
-        String head[]=new String[] {"书本编号", "书本名称", "借出时间"};
+        String[] head =new String[] {"书本编号", "书本名称", "借出时间"};
         List<Object[]> tragetBookData = new ArrayList<>();
         Object[][] pBorList = BorrowingData.GetBorrowingTable(UserData.GetMainUserData().GetUserName());
-        if(pBorList == null)
-            return;
-        if(bookName != ""){
-            for(int i = 0 ;  i < pBorList.length;i++){
-                if(!BookData.FindBookForNum(pBorList[i][0].toString()).GetBookName().toLowerCase().contains(bookName.toLowerCase()))
+        if(pBorList == null){
+            pBorList  = new Object[0][0];
+        }
+        if(!Objects.equals(bookName, "")){
+            for (Object[] objects : pBorList) {
+                if (!BookData.FindBookForNum(objects[0].toString()).GetBookName().toLowerCase().contains(bookName.toLowerCase()))
                     continue;
-                tragetBookData.add(pBorList[i]);
+                tragetBookData.add(objects);
             }
             if(tragetBookData.size() == 0){
                 JOptionPane.showMessageDialog(null,"找不到符合的书");
@@ -279,9 +297,7 @@ public class MainWindow {
             }
         }
         else {
-            for(int i = 0 ;  i < pBorList.length;i++){
-                tragetBookData.add(pBorList[i]);
-            }
+            tragetBookData.addAll(Arrays.asList(pBorList));
         }
         Object[][] tabalData = tragetBookData.toArray(Object[][]::new);
         DefaultTableModel tableModel=new DefaultTableModel(tabalData,head){
