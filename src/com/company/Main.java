@@ -1,9 +1,6 @@
 package com.company;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 
-import java.sql.*;
-import java.util.Arrays;
-
 public class Main {
 
 
@@ -19,14 +16,16 @@ public class Main {
         {
             //TODO exception
         }
-        //LoginWindow loginWindow = new LoginWindow();
-        //loginWindow.ShowWindow();
         Data.LoadData();
 
+        LoginWindow loginWindow = new LoginWindow();
+        loginWindow.ShowWindow();
 
-        UserData.CreateUserDate("admin","123","1","-1");
-        MainWindow mainWindow = new MainWindow();
-        mainWindow.ShowWindow();
+
+
+        //UserData.LoadMainUserData("admin","123","1","-1");
+        //MainWindow mainWindow = new MainWindow();
+        //mainWindow.ShowWindow();
 
     }
 }

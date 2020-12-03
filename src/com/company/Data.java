@@ -1,11 +1,6 @@
 package com.company;
 
-import javax.management.openmbean.ArrayType;
-import javax.xml.transform.Result;
 import java.sql.*;
-import java.time.DateTimeException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Date;
 
@@ -14,7 +9,6 @@ public class Data {
     static final String DB_URL = "jdbc:mysql://localhost:3306/librarydata?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     static final String USER = "root";
     static final String PASS = "123456";
-    static  public List<String[]> userDataList = new ArrayList<>();
     //加载数据
     static void LoadData(){
         Connection conn = null;
@@ -39,17 +33,10 @@ public class Data {
                 // 通过字段检索
                 String userName  = rsUser.getString("UserName");
                 String passWorld = rsUser.getString("Password");
-                String bookOnLoan = rsUser.getString("Jurisdiction");
+                String jurisdiction = rsUser.getString("Jurisdiction");
                 String borrowingCardPeriod = rsUser.getString("BorrowingCardPeriod");
 
-                // 输出数据
-                String[] userData = new String[4];
-                userData[0] = userName;
-                userData[1] = passWorld;
-                userData[2] = bookOnLoan;
-                userData[3] = borrowingCardPeriod;
-
-                userDataList.add(userData);
+                UserData.AddUser(userName,passWorld,jurisdiction,borrowingCardPeriod);
 
             }
             rsUser.close();
@@ -104,15 +91,41 @@ public class Data {
             e.printStackTrace();
         }
     }
+    static void AddUserData(String userName ,String userPassword,String Jurisdiction){
+        Connection conn = null;
+        PreparedStatement pstmt;
+
+        try {
+            //调用DriverManager对象的getConnection()方法，获得一个Connection对象
+            conn = DriverManager.getConnection(DB_URL,USER,PASS);
+            //创建一个Statement对象
+
+
+            String userInsSQL;
+            userInsSQL = "insert into userdata (UserName,Password,Jurisdiction,BorrowingCardPeriod) values(?,?,?,?)";
+            pstmt = conn.prepareStatement (userInsSQL);
+            pstmt.setString(1,userName );
+            pstmt.setString(2, userPassword);
+            pstmt.setString(3, Jurisdiction);
+            pstmt.setString(4, "正常");
+            pstmt.executeUpdate();
+
+            UserData.AddUser(userName,userPassword,Jurisdiction,"正常");
+            pstmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     static UserData FindUser(String name){
-        for(int i = 0 ;i<userDataList.size();i++){
-            if(Objects.equals(userDataList.get(i)[0], name)){
+        for(int i = 0 ;i<UserData.GetUserDataList().size();i++){
+            if(Objects.equals(UserData.GetUserDataList().get(i).GetUserName(), name)){
                 System.out.println("找到用户");
-                return UserData.CreateUserDate(
-                        userDataList.get(i)[0],
-                        userDataList.get(i)[1],
-                        userDataList.get(i)[2],
-                        userDataList.get(i)[3]);
+                return UserData.LoadMainUserData(
+                        UserData.GetUserDataList().get(i).GetUserName(),
+                        UserData.GetUserDataList().get(i).GetUserPassword(),
+                        UserData.GetUserDataList().get(i).GetUserJurisdiction(),
+                        UserData.GetUserDataList().get(i).GetUserBorrowingCardPeriod());
             }
         }
         System.out.println("用户不存在");
