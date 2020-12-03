@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class BookData {
-    private static List<BookData> bookData;
+    private static List<BookData> bookDataList;
     private static Object[][] bookDateTable;
     private String bookNumber;
     private String bookName;
@@ -19,27 +19,42 @@ public class BookData {
         this.borrowingSituation = borrowingSituation;
         this.lendingDate = lendingDate;
     }
+    public String GetBookNumber(){return bookNumber;}
+    public String GetBookName(){return bookName;}
+    public String GetLendingDate(){return lendingDate;}
+    public String GetBorrowingSituation(){return borrowingSituation;}
     public static void AddBook(String bookNumber, String bookName, String borrowingSituation, String lendingDate){
-        if(bookData == null){
-            bookData = new ArrayList<>();
-            bookData.add(new BookData(bookNumber,bookName,borrowingSituation,lendingDate));
+        if(bookDataList == null){
+            bookDataList = new ArrayList<>();
+            bookDataList.add(new BookData(bookNumber,bookName,borrowingSituation,lendingDate));
             return;
         }
-        bookData.add(new BookData(bookNumber,bookName,borrowingSituation,lendingDate));
+        bookDataList.add(new BookData(bookNumber,bookName,borrowingSituation,lendingDate));
     }
     public static void DelBook(String bookNumber){
-        bookData.removeIf(bookData -> Objects.equals(bookData.bookNumber , bookNumber));
+        bookDataList.removeIf(bookData -> Objects.equals(bookData.bookNumber , bookNumber));
+    }
+    public static BookData FindBookForNum(String bookNumber){
+        for(int i = 0 ; i < bookDataList.size(); i++){
+            if(Objects.equals(bookDataList.get(i).bookNumber, bookNumber)){
+                return  bookDataList.get(i);
+            }
+        }
+        return null;
+    }
+    public void ChangeborrowingSituation(String borrowingSituation){
+        this.borrowingSituation = borrowingSituation;
     }
     public static Object[][] GetBookTable(){
-        if(bookData == null){
+        if(bookDataList == null){
             return null;
         }
-        Object[][] date = new Object[bookData.size()][size];
-        for (int i = 0 ; i < bookData.size();i++){
-            date[i][0] = bookData.get(i).bookNumber;
-            date[i][1] = bookData.get(i).bookName;
-            date[i][2] = bookData.get(i).borrowingSituation;
-            date[i][3] = bookData.get(i).lendingDate;
+        Object[][] date = new Object[bookDataList.size()][size];
+        for (int i = 0; i < bookDataList.size(); i++){
+            date[i][0] = bookDataList.get(i).bookNumber;
+            date[i][1] = bookDataList.get(i).bookName;
+            date[i][2] = bookDataList.get(i).borrowingSituation;
+            date[i][3] = bookDataList.get(i).lendingDate;
         }
         return bookDateTable = date;
     }

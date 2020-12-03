@@ -3,8 +3,6 @@ package com.company;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Date;
-import java.util.Objects;
 
 public class RegistrationWindow {
     private JPanel panel1;
@@ -26,7 +24,7 @@ public class RegistrationWindow {
                     return;
                 }
                 JOptionPane.showMessageDialog(null,"注册成功");
-                Data.AddUserData(account,password,"用户");
+                Data.InsUserData(account,password,"用户");
                 Data.FindUser(account);
                 MainWindow mainWindow = new MainWindow();
                 mainWindow.ShowWindow();

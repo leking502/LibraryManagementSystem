@@ -25,8 +25,10 @@ public class Data {
 
             String userDataSQL;
             String bookDataSQL;
+            String borDataSQL;
             userDataSQL = "SELECT UserName, Password, Jurisdiction, BorrowingCardPeriod from userdata";
             bookDataSQL = "SELECT BookNumber, BookName, BorrowingSituation,PublicationTime from bookdata";
+            borDataSQL = "SELECT UserName, BookNumber,BorrowingDate from borrowingdata";
             ResultSet rsUser = stmt.executeQuery(userDataSQL);
             //加载用户数据
             while(rsUser.next()){
@@ -52,6 +54,18 @@ public class Data {
                 BookData.AddBook(bookNumber,bookName,borrowingSituation,lendingDate);
             }
             rsBook.close();
+
+            ResultSet rsBorrowing = stmt.executeQuery(borDataSQL);
+            while (rsBorrowing.next()){
+                // 通过字段检索
+                String userName  = rsBorrowing.getString("UserName");
+                String bookNumber = rsBorrowing.getString("BookNumber");
+                Date borrowingDate = rsBorrowing.getDate("BorrowingDate");
+                // 输出数据
+                BorrowingData.AddBorrowingData(userName,bookNumber,borrowingDate);
+            }
+            rsBorrowing.close();
+
             stmt.close();
             conn.close();
 
@@ -63,7 +77,7 @@ public class Data {
             e.printStackTrace();
         }
     }
-    static void AddBookData(String bookName ,String publicationTime){
+    static void InsBookData(String bookName , String publicationTime){
         Date date = new Date();
         int bookNumber = Math.abs ((bookName + publicationTime+date.toString()).hashCode());
         Connection conn = null;
@@ -91,7 +105,7 @@ public class Data {
             e.printStackTrace();
         }
     }
-    static void AddUserData(String userName ,String userPassword,String Jurisdiction){
+    static void InsUserData(String userName , String userPassword, String Jurisdiction){
         Connection conn = null;
         int userNumber = Math.abs ((userName + userPassword).hashCode());
         PreparedStatement pstmt;
@@ -119,7 +133,31 @@ public class Data {
             e.printStackTrace();
         }
     }
-    static  void DelBookData(String bookNumber){
+    static void InsBorData(String userName,String bookNumber,java.sql.Date date){
+        Connection conn = null;
+        PreparedStatement pstmt;
+        try {
+            //调用DriverManager对象的getConnection()方法，获得一个Connection对象
+            conn = DriverManager.getConnection(DB_URL,USER,PASS);
+            //创建一个Statement对象
+
+            String userInsSQL;
+            userInsSQL = "insert into borrowingdata (UserName,BookNumber,BorrowingDate) values(?,?,?)";
+            pstmt = conn.prepareStatement (userInsSQL);
+            pstmt.setString(1,userName );
+            pstmt.setString(2,bookNumber );
+            pstmt.setDate(3, date);
+
+            pstmt.executeUpdate();
+
+            pstmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        BorrowingData.AddBorrowingData(userName,bookNumber,date);
+    }
+    static void DelBookData(String bookNumber){
 
         String sql = "delete from bookdata where BookNumber='" + bookNumber + "'";
         PreparedStatement pstmt;
@@ -135,9 +173,7 @@ public class Data {
         }
         BookData.DelBook(bookNumber);
     }
-    static  void DelUserData(String userName){
-
-
+    static void DelUserData(String userName){
         String sql = "delete from userdata where UserName='" + userName + "'";
         PreparedStatement pstmt;
         try {
@@ -151,6 +187,34 @@ public class Data {
             e.printStackTrace();
         }
         UserData.DelUser(userName);
+    }
+    static void DelBorData(String bookNumber){
+        String sql = "delete from borrowingdata where BookNumber='" + bookNumber + "'";
+        PreparedStatement pstmt;
+        try {
+            Connection conn = DriverManager.getConnection(DB_URL,USER,PASS);
+            pstmt = (PreparedStatement) conn.prepareStatement(sql);
+            pstmt.executeUpdate();
+            pstmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        BorrowingData.DelBorrowingData(bookNumber);
+    }
+    static void UpDataBook(String bookNumber,String type){
+
+        String sql = "update bookdata set BorrowingSituation='" + type + "' where BookNumber='" + bookNumber + "'";
+        PreparedStatement pstmt;
+        try {
+            Connection conn = DriverManager.getConnection(DB_URL,USER,PASS);
+            pstmt = (PreparedStatement) conn.prepareStatement(sql);
+            pstmt.executeUpdate();
+            pstmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     static UserData FindUser(String name){

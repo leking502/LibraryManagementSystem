@@ -23,7 +23,7 @@ public class Main {
 
 
 
-        //UserData.LoadMainUserData("admin","123","1","-1");
+        //UserData.LoadMainUserData("admin","admin","管理员","正常");
         //MainWindow mainWindow = new MainWindow();
         //mainWindow.ShowWindow();
 

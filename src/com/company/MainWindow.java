@@ -1,7 +1,5 @@
 package com.company;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -23,7 +21,7 @@ public class MainWindow {
     private JTextField textField1;
     private JTabbedPane tabbedPane2;
     private JTable allBook;
-    private JTable table2;
+    private JTable borTable;
     private JTextField addBookName;
     private JTextField publicationTime;
     private JButton addButton;
@@ -31,19 +29,24 @@ public class MainWindow {
     private JTextField textFieldUser;
     private JButton sUserButton;
     private JButton delUserButton;
-    private JButton 借阅选定图书Button;
+    private JButton borBookButton;
     private JTable tableBookM;
     private JTextField textFieldBookM;
     private JButton sButtonM;
     private JButton delBookButtonM;
+    private JTextField textFieldBor;
+    private JButton sBorBookButton;
+    private JButton reBorButton;
     private Object tragetBookObject;
     private Object tragetBookObjectM;
     private Object tragetUserObject;
+    private Object tragetBorBookObject;
 
     public void UpdataAllTable(){
         BookTableUpdata("",allBook);
         UserTableUpdata("",userTable);
         BookTableUpdata("",tableBookM);
+        BorTableUpdata("",borTable);
     }
     public  void UpdataAllBookTable(){
         BookTableUpdata("",tableBookM);
@@ -54,6 +57,7 @@ public class MainWindow {
         BookTableUpdata("",allBook);
         UserTableUpdata("",userTable);
         BookTableUpdata("",tableBookM);
+        BorTableUpdata("",borTable);
 
         sButton.addActionListener(new ActionListener() {
             @Override
@@ -82,7 +86,7 @@ public class MainWindow {
                 if(addBookName.getText().trim() == "" || publicationTime.getText().trim() == ""){
                     return;
                 }
-                Data.AddBookData(addBookName.getText(),publicationTime.getText());
+                Data.InsBookData(addBookName.getText(),publicationTime.getText());
                 JOptionPane.showMessageDialog(null,
                         "书名：" + addBookName.getText()+
                         "\n出版日期："+ publicationTime.getText()+
@@ -133,9 +137,58 @@ public class MainWindow {
         });
         tableBookM.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                int row = allBook.rowAtPoint(e.getPoint());
-                tragetBookObjectM = allBook.getValueAt(row,0);
+            public void mousePressed(MouseEvent e) {
+                int row = tableBookM.rowAtPoint(e.getPoint());
+                tragetBookObjectM = tableBookM.getValueAt(row,0);
+            }
+        });
+        tabbedPane1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if(Objects.equals(UserData.GetMainUserData().GetMainUserJurisdiction(), "用户")&& tabbedPane1.getSelectedIndex() == 3){
+                    tabbedPane1.setSelectedIndex(0);
+                    JOptionPane.showMessageDialog(null,"你不是管理员");
+                }
+            }
+        });
+        borBookButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(tragetBookObject == null){
+                    return;
+                }
+                if(Objects.equals(BookData.FindBookForNum(tragetBookObject.toString()).GetBorrowingSituation(), "已借出")){
+                    JOptionPane.showMessageDialog(null,"该书已被借出");
+                    return;
+                }
+                JOptionPane.showMessageDialog(null,"借了编号为:"+tragetBookObject.toString()+"的图书");
+                BorrowingData.BorBook(tragetBookObject.toString(),new java.sql.Date(new Date().getTime()));
+                UpdataAllTable();
+            }
+        });
+        borTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                int row = borTable.rowAtPoint(e.getPoint());
+                tragetBorBookObject = borTable.getValueAt(row,0);
+            }
+        });
+        sBorBookButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BorTableUpdata(textFieldBor.getText().trim(),borTable);
+                textFieldBor.setText("");
+            }
+        });
+        reBorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(tragetBorBookObject == null){
+                    return;
+                }
+                JOptionPane.showMessageDialog(null,"归还了编号为："+tragetBorBookObject.toString()+"的图书");
+                BorrowingData.ReBorBook(tragetBorBookObject.toString());
+                UpdataAllTable();
             }
         });
     }
@@ -145,7 +198,7 @@ public class MainWindow {
         frame.setContentPane(new MainWindow().panel1);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
-        frame.setBounds(800,400,450,300);
+        frame.setBounds(800,400,750,500);
         frame.setVisible(true);
     }
     void BookTableUpdata(String bookName,JTable table){
@@ -198,6 +251,39 @@ public class MainWindow {
             }
         }
         Object[][] tabalData = tragetUserData.toArray(Object[][]::new);
+        DefaultTableModel tableModel=new DefaultTableModel(tabalData,head){
+            public boolean isCellEditable(int row, int column)
+            {
+                return false;
+            }
+        };
+        RowSorter<TableModel> rowSorter = new TableRowSorter<TableModel>(tableModel);
+        table.setRowSorter(rowSorter);
+        table.setModel(tableModel);
+    }
+    void BorTableUpdata(String bookName,JTable table){
+        String head[]=new String[] {"书本编号", "书本名称", "借出时间"};
+        List<Object[]> tragetBookData = new ArrayList<>();
+        Object[][] pBorList = BorrowingData.GetBorrowingTable(UserData.GetMainUserData().GetUserName());
+        if(pBorList == null)
+            return;
+        if(bookName != ""){
+            for(int i = 0 ;  i < pBorList.length;i++){
+                if(!BookData.FindBookForNum(pBorList[i][0].toString()).GetBookName().toLowerCase().contains(bookName.toLowerCase()))
+                    continue;
+                tragetBookData.add(pBorList[i]);
+            }
+            if(tragetBookData.size() == 0){
+                JOptionPane.showMessageDialog(null,"找不到符合的书");
+                return;
+            }
+        }
+        else {
+            for(int i = 0 ;  i < pBorList.length;i++){
+                tragetBookData.add(pBorList[i]);
+            }
+        }
+        Object[][] tabalData = tragetBookData.toArray(Object[][]::new);
         DefaultTableModel tableModel=new DefaultTableModel(tabalData,head){
             public boolean isCellEditable(int row, int column)
             {
