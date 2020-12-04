@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="LibraryManagementSystem:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/LibraryManagementSystem_jar</output-path>
+    <root id="archive" name="LibraryManagementSystem.jar">
+      <element id="module-output" name="LibraryManagementSystem" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/beautyeye_lnf.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/mysql-connector-java-8.0.22.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

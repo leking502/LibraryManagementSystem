@@ -19,6 +19,9 @@ public class BookData {
         this.borrowingSituation = borrowingSituation;
         this.lendingDate = lendingDate;
     }
+    public static void DelData(){
+        bookDataList = null;
+    }
     public static int GetBookTotal(){
         return bookDataList.size();
     }
@@ -50,7 +53,7 @@ public class BookData {
     }
     public static Object[][] GetBookTable(){
         if(bookDataList == null){
-            return null;
+            return new Object[0][0];
         }
         Object[][] date = new Object[bookDataList.size()][size];
         for (int i = 0; i < bookDataList.size(); i++){

@@ -17,6 +17,10 @@ public class BorrowingData {
     public String GetBookNumber(){ return bookNumber;}
     public Date GetBorrowingDate() { return borrowingDate; }
 
+    public static void DelData(){
+        borrowingDataList = null;
+    }
+
     public BorrowingData(String userName, String bookNumber, Date borrowingDate) {
         this.userName = userName;
         this.bookNumber = bookNumber;
@@ -56,7 +60,7 @@ public class BorrowingData {
     }
     static Object[][] GetBorrowingTable(String userName){
         if (borrowingDataList == null){
-            return null;
+            return new Object[0][0];
         }
         int size_ = 0;
         for (int i = 0; i < borrowingDataList.size(); i++) {
@@ -77,6 +81,6 @@ public class BorrowingData {
                 return borrowingTable = data;
             }
         }
-        return null;
+        return new Object[0][0];
     }
 }

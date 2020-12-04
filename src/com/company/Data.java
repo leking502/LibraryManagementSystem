@@ -1,6 +1,8 @@
 package com.company;
 
+import javax.swing.*;
 import java.sql.*;
+import java.util.List;
 import java.util.Objects;
 import java.util.Date;
 
@@ -76,6 +78,19 @@ public class Data {
             System.out.println("找不到MySQL驱动!");
             e.printStackTrace();
         }
+    }
+    static void UpData(){
+        DelData();
+        LoadData();
+        if(!CheckMainUser(UserData.GetMainUserData().GetUserName())){
+            MainWindow.Despose();
+            JOptionPane.showMessageDialog(null,"你的账号已删除");
+        }
+    }
+    static void DelData(){
+        BookData.DelData();
+        UserData.DelData();
+        BorrowingData.DelData();
     }
     static void InsBookData(String bookName , String publicationTime){
         Date date = new Date();
@@ -172,6 +187,7 @@ public class Data {
             e.printStackTrace();
         }
         BookData.DelBook(bookNumber);
+
     }
     static void DelUserData(String userName){
         String sql = "delete from userdata where UserName='" + userName + "'";
@@ -217,7 +233,20 @@ public class Data {
         }
     }
 
-    static UserData FindUser(String name){
+    static boolean CheckMainUser(String userName){
+        List<UserData> list = UserData.GetUserDataList();
+        if(list != null){
+            for(UserData userData : list){
+                if(Objects.equals(userData.GetUserName(), userName)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    static UserData SetMainUser(String name){
         for(int i = 0 ;i<UserData.GetUserDataList().size();i++){
             if(Objects.equals(UserData.GetUserDataList().get(i).GetUserName(), name)){
                 System.out.println("找到用户");

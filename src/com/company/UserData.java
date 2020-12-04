@@ -1,5 +1,7 @@
 package com.company;
 
+import com.mysql.cj.x.protobuf.MysqlxCrud;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +17,9 @@ public class UserData {
     static private Object[][] userDataTable;
     static final int size = 4;
 
+    public static void DelData(){
+        userDataList = null;
+    }
     private UserData(String userName, String password, String jurisdiction, String borrowingCardPeriod) {
         this.userName = userName;
         this.password = password;
@@ -27,6 +32,9 @@ public class UserData {
         return mainUserData;
     }
 
+    public static void Cancellation(){
+        mainUserData = null;
+    }
     public static UserData GetMainUserData(){return mainUserData;}
 
     public String GetUserName(){return userName;}
@@ -57,7 +65,7 @@ public class UserData {
     }
     public static Object[][] GetUserTable(){
         if(userDataList == null){
-            return null;
+            return new Object[0][0];
         }
         Object[][] date = new Object[userDataList.size()][size];
         for (int i = 0 ; i < userDataList.size();i++){
@@ -67,6 +75,17 @@ public class UserData {
             date[i][3] = userDataList.get(i).borrowingCardPeriod;
         }
         return userDataTable = date;
+    }
+
+    public static UserData FindUser(String userName){
+        if(userDataList == null){
+            return null;
+        }
+        for (UserData userData : userDataList){
+            if (Objects.equals(userData.userName, userName))
+                return userData;
+        }
+        return null;
     }
 }
 

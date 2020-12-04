@@ -14,21 +14,21 @@ import java.util.*;
 public class MainWindow {
     private static JFrame frame;
     private JPanel panel1;
-    private JTabbedPane tabbedPane1;
+    private JTabbedPane tabbedPaneA;
     private JButton sButton;
     private JTextField textField1;
-    private JTabbedPane tabbedPane2;
-    private JTable allBook;
-    private JTable borTable;
+    private JTabbedPane tabbedPaneM;
+    private JTable bookTableA;
+    private JTable borTableA;
     private JTextField addBookName;
     private JTextField publicationTime;
     private JButton addButton;
-    private JTable userTable;
+    private JTable userTableM;
     private JTextField textFieldUser;
     private JButton sUserButton;
     private JButton delUserButton;
     private JButton borBookButton;
-    private JTable tableBookM;
+    private JTable bookTableM;
     private JTextField textFieldBookM;
     private JButton sButtonM;
     private JButton delBookButtonM;
@@ -38,33 +38,103 @@ public class MainWindow {
     private JLabel welcomeText;
     private JLabel bookTotal;
     private JLabel adminWelcome;
-    private Object tragetBookObject;
-    private Object tragetBookObjectM;
-    private Object tragetUserObject;
-    private Object tragetBorBookObject;
+    private JButton 注销Button;
+    private JButton 刷新Button;
+    private JButton 刷新Button1;
+    private JLabel tBookNumA;
+    private JLabel tBookNameA;
+    private JLabel tBookDateA;
+    private JLabel tRbBookNumA;
+    private JLabel tRbBookNameA;
+    private JLabel tUserNameM;
+    private JLabel tBookNumM;
+    private JLabel tBookNameM;
+    private JLabel tBookDateM;
+    private JButton 更新Button;
+    private JButton 更新Button1;
+    private Object tragetBookA;
+    private Object tragetBookM;
+    private Object tragetUserM;
+    private Object tragetRbBookA;
 
     public void SetTargetNull(){
-        tragetBookObject = null;
-        tragetBookObjectM = null;
-        tragetUserObject = null;
-        tragetBorBookObject = null;
+        tragetBookA = null;
+        tragetBookM = null;
+        tragetUserM = null;
+        tragetRbBookA = null;
     }
-    public void UpdataAllTable(){
-        BookTableUpdata("",allBook);
-        UserTableUpdata("",userTable);
-        BookTableUpdata("",tableBookM);
-        BorTableUpdata("",borTable);
+    void UpdataTraget(){
+        if(tragetBookA == null){
+            tBookNumA.setText("");
+            tBookNameA.setText("");
+            tBookDateA.setText("");
+        } else {
+            BookData bookData = BookData.FindBookForNum(tragetBookA.toString());
+            if(bookData == null){
+                System.out.println("该书不存在");
+                return;
+            }
+            tBookNumA.setText(" 编号: "+bookData.GetBookNumber());
+            tBookNameA.setText(" 书名: "+bookData.GetBookName());
+            tBookDateA.setText(" 出版日: "+bookData.GetLendingDate());
+        }
+        if(tragetRbBookA == null){
+            tRbBookNumA.setText("");
+            tRbBookNameA.setText("");
+
+        }else {
+            BookData bookData = BookData.FindBookForNum(tragetRbBookA.toString());
+            if(bookData == null){
+                System.out.println("该书不存在");
+                return;
+            }
+            tRbBookNumA.setText(" 编号: "+bookData.GetBookNumber());
+            tRbBookNameA.setText(" 书名: "+bookData.GetBookName());
+        }
+        if(tragetBookM == null){
+            tBookNumM.setText("");
+            tBookNameM.setText("");
+
+        }else {
+            BookData bookData = BookData.FindBookForNum(tragetBookM.toString());
+            if(bookData == null){
+                System.out.println("该书不存在");
+                return;
+            }
+            tBookNumM.setText(" 编号: "+bookData.GetBookNumber());
+            tBookNameM.setText(" 书名: "+bookData.GetBookName());
+        }
+        if(tragetUserM == null){
+            tUserNameM.setText("");
+        }else {
+            if(UserData.FindUser(tragetUserM.toString()) == null){
+                System.out.println("该书不存在");
+                return;
+            };
+            tUserNameM.setText(" 用户名: " + tragetUserM.toString());
+        }
+    }
+    void Updata(){
+        Data.UpData();
+        UpdataAllTable();
+        SetTargetNull();
+        UpdataTraget();
     }
     public  void UpdataAllBookTable(){
-        BookTableUpdata("",tableBookM);
-        BookTableUpdata("",allBook);
+        BookTableUpdata("", bookTableM);
+        BookTableUpdata("", bookTableA);
+    }
+    public void UpdataAllTable(){
+        UserTableUpdata("", userTableM);
+        BorTableUpdata("", borTableA);
+        UpdataAllBookTable();
     }
     public MainWindow() {
 
-        BookTableUpdata("",allBook);
-        UserTableUpdata("",userTable);
-        BookTableUpdata("",tableBookM);
-        BorTableUpdata("",borTable);
+        BookTableUpdata("", bookTableA);
+        UserTableUpdata("", userTableM);
+        BookTableUpdata("", bookTableM);
+        BorTableUpdata("", borTableA);
 
         if(Objects.equals(UserData.GetMainUserData().GetMainUserJurisdiction(), "管理员")){
             adminWelcome.setText(UserData.GetMainUserData().GetMainUserName()+"欢迎使用管理员功能");
@@ -74,21 +144,21 @@ public class MainWindow {
         sButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                BookTableUpdata(textField1.getText().trim(),allBook);
+                BookTableUpdata(textField1.getText().trim(), bookTableA);
                 textField1.setText("");
             }
         });
         sUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                UserTableUpdata(textFieldUser.getText().trim(),userTable);
+                UserTableUpdata(textFieldUser.getText().trim(), userTableM);
                 textFieldUser.setText("");
             }
         });
         sButtonM.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                BookTableUpdata(textFieldBookM.getText().trim(),tableBookM);
+                BookTableUpdata(textFieldBookM.getText().trim(), bookTableM);
                 textFieldBookM.setText("");
             }
         });
@@ -103,72 +173,90 @@ public class MainWindow {
                         "书名：" + addBookName.getText()+
                         "\n出版日期："+ publicationTime.getText()+
                         "\n添加成功");
+                addBookName.setText("");
+                publicationTime.setText("");
                 UpdataAllTable();
             }
         });
-        allBook.addMouseListener(new MouseAdapter() {
+        bookTableA.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int row = allBook.rowAtPoint(e.getPoint());
-                tragetBookObject = allBook.getValueAt(row,0);
+                Data.UpData();
+
+                int row = bookTableA.rowAtPoint(e.getPoint());
+                tragetBookA = bookTableA.getValueAt(row,0);
+
+                UpdataTraget();
             }
         });
-        userTable.addMouseListener(new MouseAdapter() {
+        userTableM.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int row = userTable.rowAtPoint(e.getPoint());
-                tragetUserObject = userTable.getValueAt(row,0);
+                Data.UpData();
 
+                int row = userTableM.rowAtPoint(e.getPoint());
+                tragetUserM = userTableM.getValueAt(row,0);
+
+                UpdataTraget();
             }
         });
         delUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(tragetUserObject == null){
+                if(tragetUserM == null){
                     return;
                 }
-                if(Objects.equals(tragetUserObject.toString(), UserData.GetMainUserData().GetMainUserName())){
+                if(Objects.equals(tragetUserM.toString(), UserData.GetMainUserData().GetMainUserName())){
                     JOptionPane.showMessageDialog(null,"你不可以删除自己");
                     return;
                 }
-                JOptionPane.showMessageDialog(null,"删除了账号:"+tragetUserObject.toString());
-                for (Object[] objects : Objects.requireNonNull(BorrowingData.GetBorrowingTable(tragetUserObject.toString()))) {
-                    BorrowingData.ReBorBook(objects[0].toString());
+                JOptionPane.showMessageDialog(null,"删除了账号:"+ tragetUserM.toString());
+
+                Object[][] table = BorrowingData.GetBorrowingTable(tragetUserM.toString());
+                if(table != null){
+                    for (Object[] objects : table) {
+                        BorrowingData.ReBorBook(objects[0].toString());
+                    }
                 }
-                Data.DelUserData(tragetUserObject.toString());
+                Data.DelUserData(tragetUserM.toString());
                 UpdataAllTable();
             }
         });
         delBookButtonM.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(tragetBookObjectM == null){
+                if(tragetBookM == null){
                     return;
                 }
-                JOptionPane.showMessageDialog(null,"删除了编号为:"+tragetBookObjectM.toString()+"的图书");
+                JOptionPane.showMessageDialog(null,"删除了编号为:"+ tragetBookM.toString()+"的图书");
                 for(UserData userData : UserData.GetUserDataList()){
                     for(Object[] objects : Objects.requireNonNull(BorrowingData.GetBorrowingTable(userData.GetUserName()))){
-                        if(objects[0] == tragetBookObjectM){
+                        if(objects[0] == tragetBookM){
                             BorrowingData.ReBorBook(objects[0].toString());
                         }
                     }
                 }
-                Data.DelBookData(tragetBookObjectM.toString());
+                Data.DelBookData(tragetBookM.toString());
                 UpdataAllTable();
             }
         });
-        tableBookM.addMouseListener(new MouseAdapter() {
+        bookTableM.addMouseListener(new MouseAdapter() {
             @Override
-            public void mousePressed(MouseEvent e) {
-                int row = tableBookM.rowAtPoint(e.getPoint());
-                tragetBookObjectM = tableBookM.getValueAt(row,0);
+            public void mouseClicked(MouseEvent e) {
+                Data.UpData();
+
+                int row = bookTableM.rowAtPoint(e.getPoint());
+                tragetBookM = bookTableM.getValueAt(row,0);
+
+                UpdataTraget();
             }
         });
-        tabbedPane1.addMouseListener(new MouseAdapter() {
+        tabbedPaneA.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if(Objects.equals(UserData.GetMainUserData().GetMainUserJurisdiction(), "用户")&& tabbedPane1.getSelectedIndex() == 3){
-                    tabbedPane1.setSelectedIndex(0);
+                Updata();
+                if(Objects.equals(UserData.GetMainUserData().GetMainUserJurisdiction(), "用户")&& tabbedPaneA.getSelectedIndex() == 3){
+                    tabbedPaneA.setSelectedIndex(0);
                     JOptionPane.showMessageDialog(null,"你不是管理员");
                 }
             }
@@ -176,51 +264,102 @@ public class MainWindow {
         borBookButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(tragetBookObject == null){
+                if(tragetBookA == null){
                     return;
                 }
-                if(Objects.equals(BookData.FindBookForNum(tragetBookObject.toString()).GetBorrowingSituation(), "已借出")){
+                if(Objects.equals(BookData.FindBookForNum(tragetBookA.toString()).GetBorrowingSituation(), "已借出")){
                     JOptionPane.showMessageDialog(null,"该书已被借出");
                     return;
                 }
-                JOptionPane.showMessageDialog(null,"借了编号为:"+tragetBookObject.toString()+"的图书");
-                BorrowingData.BorBook(tragetBookObject.toString(),new java.sql.Date(new Date().getTime()));
+                JOptionPane.showMessageDialog(null,"借了编号为:"+ tragetBookA.toString()+"的图书");
+                BorrowingData.BorBook(tragetBookA.toString(),new java.sql.Date(new Date().getTime()));
+                Data.UpData();
                 UpdataAllTable();
             }
         });
-        borTable.addMouseListener(new MouseAdapter() {
+        borTableA.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                int row = borTable.rowAtPoint(e.getPoint());
-                tragetBorBookObject = borTable.getValueAt(row,0);
+                Data.UpData();
+
+                int row = borTableA.rowAtPoint(e.getPoint());
+                tragetRbBookA = borTableA.getValueAt(row,0);
+
+                UpdataTraget();
             }
         });
         sBorBookButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                BorTableUpdata(textFieldBor.getText().trim(),borTable);
+                BorTableUpdata(textFieldBor.getText().trim(), borTableA);
                 textFieldBor.setText("");
             }
         });
         reBorButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(tragetBorBookObject == null){
+                if(tragetRbBookA == null){
                     return;
                 }
-                JOptionPane.showMessageDialog(null,"归还了编号为："+tragetBorBookObject.toString()+"的图书");
-                BorrowingData.ReBorBook(tragetBorBookObject.toString());
+                JOptionPane.showMessageDialog(null,"归还了编号为："+ tragetRbBookA.toString()+"的图书");
+                BorrowingData.ReBorBook(tragetRbBookA.toString());
+                Data.UpData();
                 UpdataAllTable();
+            }
+        });
+        注销Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                UserData.Cancellation();
+                Despose();
+                LoginWindow loginWindow = new LoginWindow();
+                loginWindow.ShowWindow();
+            }
+        });
+        tabbedPaneA.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Updata();
+            }
+        });
+        刷新Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Updata();
+            }
+        });
+        刷新Button1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Updata();
+            }
+        });
+        tabbedPaneM.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Updata();
+            }
+        });
+        更新Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Updata();
+            }
+        });
+        更新Button1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Updata();
             }
         });
     }
 
     public void ShowWindow() {
-        JFrame frame = new JFrame("MainWindow");
+        JFrame frame = new JFrame("图书管理系统");
         frame.setContentPane(new MainWindow().panel1);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
-        frame.setBounds(800,400,750,500);
+        frame.setBounds(500,200,800,500);
         frame.setResizable(false);
         frame.setVisible(true);
         this.frame = frame;
@@ -244,7 +383,7 @@ public class MainWindow {
                 tragetBookData.add(BookData.GetBookTable()[i]);
             }
         }
-        Object[][] tabalData = tragetBookData.toArray(Object[][]::new);
+        Object[][] tabalData = tragetBookData.toArray(new Object[0][]);
         DefaultTableModel tableModel=new DefaultTableModel(tabalData,head){
             public boolean isCellEditable(int row, int column)
             {
@@ -274,7 +413,7 @@ public class MainWindow {
                 tragetUserData.add(UserData.GetUserTable()[i]);
             }
         }
-        Object[][] tabalData = tragetUserData.toArray(Object[][]::new);
+        Object[][] tabalData = tragetUserData.toArray(new Object[0][]);
         DefaultTableModel tableModel=new DefaultTableModel(tabalData,head){
             public boolean isCellEditable(int row, int column)
             {
@@ -306,7 +445,7 @@ public class MainWindow {
         else {
             tragetBookData.addAll(Arrays.asList(pBorList));
         }
-        Object[][] tabalData = tragetBookData.toArray(Object[][]::new);
+        Object[][] tabalData = tragetBookData.toArray(new Object[0][]);
         DefaultTableModel tableModel=new DefaultTableModel(tabalData,head){
             public boolean isCellEditable(int row, int column)
             {
@@ -317,8 +456,5 @@ public class MainWindow {
         table.setRowSorter(rowSorter);
         table.setModel(tableModel);
     }
-
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-    }
+    static void Despose(){frame.dispose();}
 }

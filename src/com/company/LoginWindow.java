@@ -1,8 +1,6 @@
 package com.company;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Objects;
 
 public class LoginWindow {
@@ -17,7 +15,7 @@ public class LoginWindow {
         button.addActionListener(e -> {
             String account = textField1.getText();
             String password = String.valueOf(passwordField1.getPassword());
-            Data.FindUser(account);
+            Data.SetMainUser(account);
             if(UserData.GetMainUserData() == null || !Objects.equals(UserData.GetMainUserData().GetUserPassword(), password)){
                 JOptionPane.showMessageDialog(null,"账户或密码错误");
                 return;

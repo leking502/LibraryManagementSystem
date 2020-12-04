@@ -9,6 +9,7 @@ public class RegistrationWindow {
     private JButton registrationButton;
     private JTextField userName;
     private JTextField userPassword;
+    private JButton 返回Button;
     private static JFrame frame;
 
     public RegistrationWindow() {
@@ -19,15 +20,24 @@ public class RegistrationWindow {
                 String password = userPassword.getText();
                 if(account.trim() == "" || password.trim() == "" )
                     return;
-                if(Data.FindUser(account) != null){
+                if(Data.SetMainUser(account) != null){
                     JOptionPane.showMessageDialog(null,"该账号已存在");
                     return;
                 }
                 JOptionPane.showMessageDialog(null,"注册成功");
                 Data.InsUserData(account,password,"用户");
-                Data.FindUser(account);
+                Data.SetMainUser(account);
                 MainWindow mainWindow = new MainWindow();
                 mainWindow.ShowWindow();
+                Dispose();
+            }
+        });
+        返回Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LoginWindow loginWindow = new LoginWindow();
+                loginWindow.ShowWindow();
+                Dispose();
             }
         });
     }
