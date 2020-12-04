@@ -2,6 +2,7 @@ package com.company;
 
 import javax.swing.*;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Date;
@@ -12,6 +13,97 @@ public class Data {
     static final String USER = "root";
     static final String PASS = "123456";
     //加载数据
+    public enum ReturnType{
+        BookData,
+        UserData,
+        BorrowingData,
+    }
+    static Object[][] GetTable(ReturnType returnType){
+        Connection conn;
+        Statement stmt;
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL,USER,PASS);
+            stmt = conn.createStatement();
+            String userDataSQL;
+            String bookDataSQL;
+            String borDataSQL;
+            userDataSQL = "SELECT UserName, Password, Jurisdiction, BorrowingCardPeriod from userdata";
+            bookDataSQL = "SELECT BookNumber,CallNumber,CollectionPlace,BookName,ResponsiblePerson,Press,LendingDate,ISBN,BorrowingSituation from bookdata";
+            borDataSQL = "SELECT UserName, BookNumber,BorrowingDate from borrowingdata";
+            if(returnType == ReturnType.UserData){
+                ResultSet rsUser = stmt.executeQuery(userDataSQL);
+                List<Object[]> table = new ArrayList<>();
+                while(rsUser.next()){
+                    // 通过字段检索
+                    String userName  = rsUser.getString("UserName");
+                    String passWorld = rsUser.getString("Password");
+                    String jurisdiction = rsUser.getString("Jurisdiction");
+                    String borrowingCardPeriod = rsUser.getString("BorrowingCardPeriod");
+                    Object[] userData = new Object[4];
+                    userData[0] = userName;
+                    userData[1] = passWorld;
+                    userData[2] = jurisdiction;
+                    userData[3] = borrowingCardPeriod;
+                    table.add(userData);
+                }
+                rsUser.close();
+                return table.toArray(Object[][]::new);
+            }else if(returnType == ReturnType.BookData){
+                ResultSet rsBook = stmt.executeQuery(bookDataSQL);
+                List<Object[]> table = new ArrayList<>();
+                while (rsBook.next()){
+                    // 通过字段检索
+                    String bookNumber  = rsBook.getString("BookNumber");
+                    String callNumber = rsBook.getString("CallNumber");
+                    String collectionPlace = rsBook.getString("CollectionPlace");
+                    String bookName = rsBook.getString("BookName");
+                    String responsiblePerson = rsBook.getString("ResponsiblePerson");
+                    String press = rsBook.getString("Press");
+                    String lendingDate = rsBook.getString("LendingDate");
+                    String ISBN = rsBook.getString("ISBN");
+                    String borrowingSituation = rsBook.getString("BorrowingSituation");
+                    Object[] bookData = new Object[9];
+                    bookData[0] = bookNumber;
+                    bookData[1] = callNumber;
+                    bookData[2] = collectionPlace;
+                    bookData[3] = bookName;
+                    bookData[4] = responsiblePerson;
+                    bookData[5] = press;
+                    bookData[6] = lendingDate;
+                    bookData[7] = ISBN;
+                    bookData[8] = borrowingSituation;
+                    table.add(bookData);
+                }
+                rsBook.close();
+                return table.toArray(Object[][]::new);
+            }else if(returnType == ReturnType.BorrowingData){
+                ResultSet rsBorrowing = stmt.executeQuery(borDataSQL);
+                List<Object[]> table = new ArrayList<>();
+                while (rsBorrowing.next()){
+                    String userName  = rsBorrowing.getString("UserName");
+                    String bookNumber = rsBorrowing.getString("BookNumber");
+                    Date borrowingDate = rsBorrowing.getDate("BorrowingDate");
+                    Object[] BorrowingData = new Object[3];
+                    BorrowingData[0] = userName;
+                    BorrowingData[1] = bookNumber;
+                    BorrowingData[2] = borrowingDate;
+                }
+                rsBorrowing.close();
+                return table.toArray(Object[][]::new);
+            }
+            stmt.close();
+            conn.close();
+        } catch (SQLException throwable) {
+            System.out.println("无法连接数据库");
+            throwable.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.out.println("找不到MySQL驱动!");
+            e.printStackTrace();
+        }
+        return new Object[0][0];
+    }
+
     static void LoadData(){
         Connection conn;
         Statement stmt;
@@ -102,9 +194,9 @@ public class Data {
         UserData.DelData();
         BorrowingData.DelData();
     }
-    static void InsBookData(String callNumber, String collectionPlace, String bookName, String responsiblePerson, String press, String lendingDate, String ISBN, String borrowingSituation){
+    static void InsBookData(String callNumber, String collectionPlace, String bookName, String responsiblePerson, String press, String lendingDate, String ISBN){
         Date date = new Date();
-        int bookNumber = Math.abs ((bookName + lendingDate+date.toString()).hashCode());
+        int bookNumber = Math.abs ((bookName + lendingDate +  responsiblePerson + press + lendingDate+date.toString()).hashCode());
         Connection conn = null;
         PreparedStatement pstmt;
 
@@ -115,15 +207,20 @@ public class Data {
 
 
             String bookInsSQL;
-            bookInsSQL = "insert into BookData (BookNumber,CallNumber,CollectionPlace,BookName,ResponsiblePerson,Press,LendingDate,ISBN,BorrowingSituation) values(?,?,?,?)";
+            bookInsSQL = "insert into BookData (BookNumber,CallNumber,CollectionPlace,BookName,ResponsiblePerson,Press,LendingDate,ISBN,BorrowingSituation) values(?,?,?,?,?,?,?,?,?)";
             pstmt = conn.prepareStatement (bookInsSQL);
             pstmt.setString(1, Integer.toString(bookNumber));
-            pstmt.setString(2, bookName);
-            pstmt.setString(3, "未借出");
-            pstmt.setString(4, lendingDate);
+            pstmt.setString(2, callNumber);
+            pstmt.setString(3, collectionPlace);
+            pstmt.setString(4, bookName);
+            pstmt.setString(5, responsiblePerson);
+            pstmt.setString(6, press);
+            pstmt.setString(7, lendingDate);
+            pstmt.setString(8, ISBN);
+            pstmt.setString(9,"未借出");
             pstmt.executeUpdate();
 
-            BookData.AddBook(Integer.toString(bookNumber),callNumber,collectionPlace,bookName,responsiblePerson,press,lendingDate,ISBN,borrowingSituation);
+            BookData.AddBook(Integer.toString(bookNumber),callNumber,collectionPlace,bookName,responsiblePerson,press,lendingDate,ISBN,"未借出");
             pstmt.close();
             conn.close();
         } catch (SQLException e) {

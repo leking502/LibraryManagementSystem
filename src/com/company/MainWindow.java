@@ -20,8 +20,8 @@ public class MainWindow {
     private JTabbedPane tabbedPaneM;
     private JTable bookTableA;
     private JTable borTableA;
-    private JTextField addBookName;
-    private JTextField publicationTime;
+    private JTextField bookNameTe;
+    private JTextField callNumberTe;
     private JButton addButton;
     private JTable userTableM;
     private JTextField textFieldUser;
@@ -52,6 +52,11 @@ public class MainWindow {
     private JLabel tBookDateM;
     private JButton 更新Button;
     private JButton 更新Button1;
+    private JTextField collectionPlaceTe;
+    private JTextField responsiblePersonTe;
+    private JTextField pressTe;
+    private JTextField lendingDateTe;
+    private JTextField ISBNTe;
     private Object tragetBookA;
     private Object tragetBookM;
     private Object tragetUserM;
@@ -165,16 +170,32 @@ public class MainWindow {
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(addBookName.getText().trim() == "" || publicationTime.getText().trim() == ""){
+                if(callNumberTe.getText().trim() == "" ||
+                        collectionPlaceTe.getText().trim() == ""||
+                        bookNameTe.getText().trim() == ""||
+                        responsiblePersonTe.getText().trim() == ""||
+                        pressTe.getText().trim() == "" ||
+                        lendingDateTe.getText().trim() == ""||
+                        ISBNTe.getText().trim() == ""){
                     return;
                 }
-                //Data.InsBookData(addBookName.getText(),publicationTime.getText());
+                Data.InsBookData(callNumberTe.getText(),
+                        collectionPlaceTe.getText(),
+                        bookNameTe.getText(),
+                        responsiblePersonTe.getText(),
+                        pressTe.getText(),
+                        lendingDateTe.getText(),
+                        ISBNTe.getText());
                 JOptionPane.showMessageDialog(null,
-                        "书名：" + addBookName.getText()+
-                        "\n出版日期："+ publicationTime.getText()+
+                        "书名：" + bookNameTe.getText()+
                         "\n添加成功");
-                addBookName.setText("");
-                publicationTime.setText("");
+                callNumberTe.setText("");
+                collectionPlaceTe.setText("");
+                bookNameTe.setText("");
+                responsiblePersonTe.setText("");
+                pressTe.setText("");
+                lendingDateTe.setText("");
+                ISBNTe.setText("");
                 UpdataAllTable();
             }
         });
@@ -212,7 +233,7 @@ public class MainWindow {
                 }
                 JOptionPane.showMessageDialog(null,"删除了账号:"+ tragetUserM.toString());
 
-                Object[][] table = BorrowingData.GetBorrowingTable(tragetUserM.toString());
+                Object[][] table = BorrowingData.GetUserBorTable(tragetUserM.toString());
                 if(table != null){
                     for (Object[] objects : table) {
                         BorrowingData.ReBorBook(objects[0].toString());
@@ -230,7 +251,7 @@ public class MainWindow {
                 }
                 JOptionPane.showMessageDialog(null,"删除了编号为:"+ tragetBookM.toString()+"的图书");
                 for(UserData userData : UserData.GetUserDataList()){
-                    for(Object[] objects : Objects.requireNonNull(BorrowingData.GetBorrowingTable(userData.GetUserName()))){
+                    for(Object[] objects : Objects.requireNonNull(BorrowingData.GetUserBorTable(userData.GetUserName()))){
                         if(objects[0] == tragetBookM){
                             BorrowingData.ReBorBook(objects[0].toString());
                         }
@@ -366,11 +387,12 @@ public class MainWindow {
     void BookTableUpdata(String bookName,JTable table){
         String head[]=new String[] {"书本编号", "索书号","馆藏地","书本名称","责任者","出版社","出版年","ISBN", "借阅状态"};
         List<Object[]> tragetBookData = new ArrayList<>();
+        Object[][] nTable = Data.GetTable(Data.ReturnType.BookData);
         if(bookName != ""){
-            for(int i = 0 ;  i < BookData.GetBookTable().length;i++){
-                if(!BookData.GetBookTable()[i][1].toString().toLowerCase().contains(bookName.toLowerCase()))
+            for(int i = 0 ;  i < nTable.length;i++){
+                if(!nTable[i][3].toString().toLowerCase().contains(bookName.toLowerCase()))
                     continue;
-                tragetBookData.add(BookData.GetBookTable()[i]);
+                tragetBookData.add(nTable[i]);
             }
             if(tragetBookData.size() == 0){
                 JOptionPane.showMessageDialog(null,"找不到符合的书");
@@ -378,8 +400,8 @@ public class MainWindow {
             }
         }
         else {
-            for(int i = 0 ;  i < BookData.GetBookTable().length;i++){
-                tragetBookData.add(BookData.GetBookTable()[i]);
+            for(int i = 0 ;  i < nTable.length;i++){
+                tragetBookData.add(nTable[i]);
             }
         }
         Object[][] tabalData = tragetBookData.toArray(new Object[0][]);
@@ -396,11 +418,12 @@ public class MainWindow {
     void UserTableUpdata(String userName,JTable table){
         String[] head =new String[] {"用户姓名", "用户密码", "权限组", "借阅证情况"};
         List<Object[]> tragetUserData = new ArrayList<>();
+        Object[][] nTable = Data.GetTable(Data.ReturnType.UserData);
         if(userName != ""){
-            for(int i = 0 ;  i < UserData.GetUserTable().length;i++){
-                if(!UserData.GetUserTable()[i][0].toString().toLowerCase().contains(userName.toLowerCase()))
+            for(int i = 0 ;  i < nTable.length;i++){
+                if(!nTable[i][0].toString().toLowerCase().contains(userName.toLowerCase()))
                     continue;
-                tragetUserData.add(UserData.GetUserTable()[i]);
+                tragetUserData.add(nTable[i]);
             }
             if(tragetUserData.size() == 0){
                 JOptionPane.showMessageDialog(null,"找不到符合用户");
@@ -408,8 +431,8 @@ public class MainWindow {
             }
         }
         else {
-            for(int i = 0 ;  i < UserData.GetUserTable().length;i++){
-                tragetUserData.add(UserData.GetUserTable()[i]);
+            for(int i = 0 ;  i < nTable.length;i++){
+                tragetUserData.add(nTable[i]);
             }
         }
         Object[][] tabalData = tragetUserData.toArray(new Object[0][]);
@@ -426,7 +449,7 @@ public class MainWindow {
     void BorTableUpdata(String bookName,JTable table){
         String[] head =new String[] {"书本编号", "书本名称", "借出时间"};
         List<Object[]> tragetBookData = new ArrayList<>();
-        Object[][] pBorList = BorrowingData.GetBorrowingTable(UserData.GetMainUserData().GetUserName());
+        Object[][] pBorList = BorrowingData.GetUserBorTable(UserData.GetMainUserData().GetUserName());
         if(pBorList == null){
             pBorList  = new Object[0][0];
         }
@@ -456,4 +479,8 @@ public class MainWindow {
         table.setModel(tableModel);
     }
     static void Despose(){frame.dispose();}
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+    }
 }
