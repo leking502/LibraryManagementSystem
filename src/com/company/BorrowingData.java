@@ -63,18 +63,18 @@ public class BorrowingData {
             return new Object[0][0];
         }
         int size_ = 0;
-        for (int i = 0; i < borrowingDataList.size(); i++) {
-            if (Objects.equals(borrowingDataList.get(i).userName, userName)) {
+        for (BorrowingData borrowingData : borrowingDataList) {
+            if (Objects.equals(borrowingData.userName, userName)) {
                 size_++;
             }
         }
         Object[][] data = new Object[size_][size];
         int i = 0;
-        for (int j = 0; j < borrowingDataList.size(); j++) {
-            if (Objects.equals(borrowingDataList.get(j).userName, userName)) {
-                data[i][0] =  borrowingDataList.get(j).bookNumber;
-                data[i][1] = BookData.FindBookForNum(borrowingDataList.get(j).bookNumber).GetBookName();
-                data[i][2] = borrowingDataList.get(j).borrowingDate;
+        for (BorrowingData borrowingData : borrowingDataList) {
+            if (Objects.equals(borrowingData.userName, userName)) {
+                data[i][0] = borrowingData.bookNumber;
+                data[i][1] = Objects.requireNonNull(BookData.FindBookForNum(borrowingData.bookNumber)).GetBookName();
+                data[i][2] = borrowingData.borrowingDate;
                 i++;
             }
             if (i == size_) {

@@ -168,7 +168,7 @@ public class MainWindow {
                 if(addBookName.getText().trim() == "" || publicationTime.getText().trim() == ""){
                     return;
                 }
-                Data.InsBookData(addBookName.getText(),publicationTime.getText());
+                //Data.InsBookData(addBookName.getText(),publicationTime.getText());
                 JOptionPane.showMessageDialog(null,
                         "书名：" + addBookName.getText()+
                         "\n出版日期："+ publicationTime.getText()+
@@ -360,12 +360,11 @@ public class MainWindow {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setBounds(500,200,800,500);
-        frame.setResizable(false);
         frame.setVisible(true);
         this.frame = frame;
     }
     void BookTableUpdata(String bookName,JTable table){
-        String head[]=new String[] {"书本编号", "书本名称", "借阅状态", "出版时间"};
+        String head[]=new String[] {"书本编号", "索书号","馆藏地","书本名称","责任者","出版社","出版年","ISBN", "借阅状态"};
         List<Object[]> tragetBookData = new ArrayList<>();
         if(bookName != ""){
             for(int i = 0 ;  i < BookData.GetBookTable().length;i++){

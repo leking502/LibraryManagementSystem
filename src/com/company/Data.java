@@ -13,8 +13,8 @@ public class Data {
     static final String PASS = "123456";
     //加载数据
     static void LoadData(){
-        Connection conn = null;
-        Statement stmt = null;
+        Connection conn;
+        Statement stmt;
 
         try {
             //调用Class.forName()方法加载驱动程序
@@ -29,7 +29,7 @@ public class Data {
             String bookDataSQL;
             String borDataSQL;
             userDataSQL = "SELECT UserName, Password, Jurisdiction, BorrowingCardPeriod from userdata";
-            bookDataSQL = "SELECT BookNumber, BookName, BorrowingSituation,PublicationTime from bookdata";
+            bookDataSQL = "SELECT BookNumber,CallNumber,CollectionPlace,BookName,ResponsiblePerson,Press,LendingDate,ISBN,BorrowingSituation from bookdata";
             borDataSQL = "SELECT UserName, BookNumber,BorrowingDate from borrowingdata";
             ResultSet rsUser = stmt.executeQuery(userDataSQL);
             //加载用户数据
@@ -49,11 +49,21 @@ public class Data {
             while (rsBook.next()){
                 // 通过字段检索
                 String bookNumber  = rsBook.getString("BookNumber");
+                String callNumber = rsBook.getString("CallNumber");
+                String collectionPlace = rsBook.getString("CollectionPlace");
                 String bookName = rsBook.getString("BookName");
+                String responsiblePerson = rsBook.getString("ResponsiblePerson");
+                String press = rsBook.getString("Press");
+                String lendingDate = rsBook.getString("LendingDate");
+                String ISBN = rsBook.getString("ISBN");
                 String borrowingSituation = rsBook.getString("BorrowingSituation");
-                String lendingDate = rsBook.getString("PublicationTime");
+
                 // 输出数据
-                BookData.AddBook(bookNumber,bookName,borrowingSituation,lendingDate);
+
+
+
+
+                BookData.AddBook(bookNumber,callNumber,collectionPlace,bookName,responsiblePerson,press,lendingDate,ISBN,borrowingSituation);
             }
             rsBook.close();
 
@@ -92,9 +102,9 @@ public class Data {
         UserData.DelData();
         BorrowingData.DelData();
     }
-    static void InsBookData(String bookName , String publicationTime){
+    static void InsBookData(String callNumber, String collectionPlace, String bookName, String responsiblePerson, String press, String lendingDate, String ISBN, String borrowingSituation){
         Date date = new Date();
-        int bookNumber = Math.abs ((bookName + publicationTime+date.toString()).hashCode());
+        int bookNumber = Math.abs ((bookName + lendingDate+date.toString()).hashCode());
         Connection conn = null;
         PreparedStatement pstmt;
 
@@ -105,15 +115,15 @@ public class Data {
 
 
             String bookInsSQL;
-            bookInsSQL = "insert into BookData (BookNumber,BookName,BorrowingSituation,PublicationTime) values(?,?,?,?)";
+            bookInsSQL = "insert into BookData (BookNumber,CallNumber,CollectionPlace,BookName,ResponsiblePerson,Press,LendingDate,ISBN,BorrowingSituation) values(?,?,?,?)";
             pstmt = conn.prepareStatement (bookInsSQL);
             pstmt.setString(1, Integer.toString(bookNumber));
             pstmt.setString(2, bookName);
             pstmt.setString(3, "未借出");
-            pstmt.setString(4, publicationTime);
+            pstmt.setString(4, lendingDate);
             pstmt.executeUpdate();
 
-            BookData.AddBook(Integer.toString(bookNumber),bookName,"未借出",publicationTime);
+            BookData.AddBook(Integer.toString(bookNumber),callNumber,collectionPlace,bookName,responsiblePerson,press,lendingDate,ISBN,borrowingSituation);
             pstmt.close();
             conn.close();
         } catch (SQLException e) {
