@@ -55,6 +55,13 @@ public class MainWindow {
     private JTextField pressTe;
     private JTextField lendingDateTe;
     private JTextField ISBNTe;
+    private JRadioButton 索书号RadioButton;
+    private JRadioButton 藏书地RadioButton;
+    private JRadioButton 书名RadioButton;
+    private JRadioButton 责任人RadioButton;
+    private JRadioButton 出版社RadioButton;
+    private JRadioButton 出版年份RadioButton;
+    private JRadioButton ISBNRadioButton;
     private Object tragetBookA;
     private Object tragetBookM;
     private Object tragetUserM;
@@ -72,7 +79,7 @@ public class MainWindow {
             tBookNameA.setText("");
             tBookDateA.setText("");
         } else {
-            BookData bookData = BookData.FindBookForNum(tragetBookA.toString());
+            BookData bookData = Data.FindBookForNum(tragetBookA.toString());
             if(bookData == null){
                 System.out.println("该书不存在");
                 return;
@@ -86,7 +93,7 @@ public class MainWindow {
             tRbBookNameA.setText("");
 
         }else {
-            BookData bookData = BookData.FindBookForNum(tragetRbBookA.toString());
+            BookData bookData = Data.FindBookForNum(tragetRbBookA.toString());
             if(bookData == null){
                 System.out.println("该书不存在");
                 return;
@@ -99,7 +106,7 @@ public class MainWindow {
             tBookNameM.setText("");
 
         }else {
-            BookData bookData = BookData.FindBookForNum(tragetBookM.toString());
+            BookData bookData = Data.FindBookForNum(tragetBookM.toString());
             if(bookData == null){
                 System.out.println("该书不存在");
                 return;
@@ -110,15 +117,14 @@ public class MainWindow {
         if(tragetUserM == null){
             tUserNameM.setText("");
         }else {
-            if(UserData.FindUser(tragetUserM.toString()) == null){
-                System.out.println("该书不存在");
+            if(Data.FindUser(tragetUserM.toString()) == null){
+                System.out.println("该用户不存在");
                 return;
             }
             tUserNameM.setText(" 用户名: " + tragetUserM.toString());
         }
     }
     void Updata(){
-        Data.UpData();
         UpdataAllTable();
         SetTargetNull();
         UpdataTraget();
@@ -134,6 +140,7 @@ public class MainWindow {
     }
     public MainWindow() {
 
+        书名RadioButton.setSelected(true);
         BookTableUpdata("", bookTableA);
         UserTableUpdata("", userTableM);
         BookTableUpdata("", bookTableM);
@@ -143,7 +150,7 @@ public class MainWindow {
             adminWelcome.setText(UserData.GetMainUserName()+"欢迎使用管理员功能");
         }
         welcomeText.setText(UserData.GetMainUserName()+"\n欢迎使用图书管理系统！");
-        bookTotal.setText("藏书总量："+ BookData.GetBookTotal());
+        bookTotal.setText("藏书总量："+ BookData.bookTotal);
         sButton.addActionListener(e -> {
             BookTableUpdata(textField1.getText().trim(), bookTableA);
             textField1.setText("");
@@ -188,7 +195,7 @@ public class MainWindow {
         bookTableA.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Data.UpData();
+
 
                 int row = bookTableA.rowAtPoint(e.getPoint());
                 tragetBookA = bookTableA.getValueAt(row,0);
@@ -199,7 +206,7 @@ public class MainWindow {
         userTableM.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Data.UpData();
+
 
                 int row = userTableM.rowAtPoint(e.getPoint());
                 tragetUserM = userTableM.getValueAt(row,0);
@@ -231,8 +238,8 @@ public class MainWindow {
                 return;
             }
             JOptionPane.showMessageDialog(null,"删除了编号为:"+ tragetBookM.toString()+"的图书");
-            for(UserData userData : UserData.GetUserDataList()){
-                for(Object[] objects : Objects.requireNonNull(BorrowingData.GetUserBorTable(userData.GetUserName()))){
+            for(Object[] userData : Data.GetUserDataTable("",null)){
+                for(Object[] objects : Objects.requireNonNull(BorrowingData.GetUserBorTable(userData[1].toString()))){
                     if(objects[0] == tragetBookM){
                         BorrowingData.ReBorBook(objects[0].toString());
                     }
@@ -244,7 +251,7 @@ public class MainWindow {
         bookTableM.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Data.UpData();
+
 
                 int row = bookTableM.rowAtPoint(e.getPoint());
                 tragetBookM = bookTableM.getValueAt(row,0);
@@ -266,19 +273,19 @@ public class MainWindow {
             if(tragetBookA == null){
                 return;
             }
-            if(Objects.equals(Objects.requireNonNull(BookData.FindBookForNum(tragetBookA.toString())).GetBorrowingSituation(), "已借出")){
+            if(Objects.equals(Objects.requireNonNull(Data.FindBookForNum(tragetBookA.toString())).GetBorrowingSituation(), "已借出")){
                 JOptionPane.showMessageDialog(null,"该书已被借出");
                 return;
             }
             JOptionPane.showMessageDialog(null,"借了编号为:"+ tragetBookA.toString()+"的图书");
             BorrowingData.BorBook(tragetBookA.toString(),new java.sql.Date(new Date().getTime()));
-            Data.UpData();
+
             UpdataAllTable();
         });
         borTableA.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                Data.UpData();
+
 
                 int row = borTableA.rowAtPoint(e.getPoint());
                 tragetRbBookA = borTableA.getValueAt(row,0);
@@ -296,7 +303,7 @@ public class MainWindow {
             }
             JOptionPane.showMessageDialog(null,"归还了编号为："+ tragetRbBookA.toString()+"的图书");
             BorrowingData.ReBorBook(tragetRbBookA.toString());
-            Data.UpData();
+
             UpdataAllTable();
         });
         cancelButtonA.addActionListener(e -> {
@@ -338,7 +345,23 @@ public class MainWindow {
         if(field == ""){
             tabalData = Data.GetBookDataTable("",null);
         }else {
-            tabalData = Data.GetBookDataTable(field,Data.BookDataType.BookName);
+            if(索书号RadioButton.isSelected()){
+                tabalData = Data.GetBookDataTable(field,Data.BookDataType.CallNumber);
+            }else if(藏书地RadioButton.isSelected()){
+                tabalData = Data.GetBookDataTable(field,Data.BookDataType.CollectionPlace);
+            } else if (书名RadioButton.isSelected()) {
+                tabalData = Data.GetBookDataTable(field,Data.BookDataType.BookName);
+            } else if (责任人RadioButton.isSelected()) {
+                tabalData = Data.GetBookDataTable(field,Data.BookDataType.ResponsiblePerson);
+            } else if (出版社RadioButton.isSelected()) {
+                tabalData = Data.GetBookDataTable(field,Data.BookDataType.Press);
+            } else if (出版年份RadioButton.isSelected()) {
+                tabalData = Data.GetBookDataTable(field,Data.BookDataType.LendingDate);
+            } else if (ISBNRadioButton.isSelected()) {
+                tabalData = Data.GetBookDataTable(field,Data.BookDataType.ISBN);
+            }else {
+                tabalData = tabalData = Data.GetBookDataTable(field,Data.BookDataType.BookName);
+            }
         }
         DefaultTableModel tableModel=new DefaultTableModel(tabalData,head){
             public boolean isCellEditable(int row, int column)
@@ -379,7 +402,7 @@ public class MainWindow {
         }
         if(!Objects.equals(field, "")){
             for (Object[] objects : pBorList) {
-                if (!Objects.requireNonNull(BookData.FindBookForNum(objects[0].toString())).GetBookName().toLowerCase().contains(field.toLowerCase()))
+                if (!Objects.requireNonNull(Data.FindBookForNum(objects[0].toString())).GetBookName().toLowerCase().contains(field.toLowerCase()))
                     continue;
                 tragetBookData.add(objects);
             }

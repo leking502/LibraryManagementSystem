@@ -8,7 +8,6 @@ import java.util.Objects;
 
 public class UserData {
     private static UserData mainUserData;
-    private static List<UserData> userDataList;
     private String userNumber;
     private String userName;
     private String password;
@@ -17,19 +16,15 @@ public class UserData {
     static private Object[][] userDataTable;
     static final int size = 4;
 
-    public static void DelData(){
-        userDataList = null;
-    }
-    private UserData(String userName, String password, String jurisdiction, String borrowingCardPeriod) {
+
+    public UserData(String userName, String password, String jurisdiction, String borrowingCardPeriod) {
         this.userName = userName;
         this.password = password;
         this.jurisdiction = jurisdiction;
         this.borrowingCardPeriod = borrowingCardPeriod;
     }
-    public static UserData LoadMainUserData(String userName, String password, String bookOnLoan, String borrowingCardPeriod){
-        if(mainUserData == null)
-            return mainUserData = new UserData(userName,password,bookOnLoan,borrowingCardPeriod);
-        return mainUserData;
+    public static void SetMainUserData(UserData mainuser){
+            mainUserData = mainuser;
     }
 
     public static void Cancellation(){
@@ -47,48 +42,7 @@ public class UserData {
     public static String GetMainUserJurisdiction(){return mainUserData.jurisdiction;}
     public static String GetMainUserBorrowingCardPeriod(){return mainUserData.borrowingCardPeriod;}
 
-    public static List<UserData> GetUserDataList(){
-        if(userDataList == null)
-            return new ArrayList<UserData>();
-        return userDataList;
-    }
-    public static void AddUser(String userName, String userPassword, String jurisdiction, String borrowingCardPeriod){
-        if(userDataList == null){
-            userDataList = new ArrayList<>();
-            userDataList.add(new UserData(userName,userPassword,jurisdiction,borrowingCardPeriod));
-            return;
-        }
-        userDataList.add(new UserData(userName,userPassword,jurisdiction,borrowingCardPeriod));
-    }
-    public static void DelUser(String userName){
-        userDataList.removeIf(userData -> Objects.equals(userData.userName, userName));
-    }
 
-    @Deprecated
-    public static Object[][] GetUserTable(){
-        if(userDataList == null){
-            return new Object[0][0];
-        }
-        Object[][] date = new Object[userDataList.size()][size];
-        for (int i = 0 ; i < userDataList.size();i++){
-            date[i][0] = userDataList.get(i).userName;
-            date[i][1] = userDataList.get(i).password;
-            date[i][2] = userDataList.get(i).jurisdiction;
-            date[i][3] = userDataList.get(i).borrowingCardPeriod;
-        }
-        return userDataTable = date;
-    }
-
-    public static UserData FindUser(String userName){
-        if(userDataList == null){
-            return null;
-        }
-        for (UserData userData : userDataList){
-            if (Objects.equals(userData.userName, userName))
-                return userData;
-        }
-        return null;
-    }
 }
 
 

@@ -36,7 +36,7 @@ public class BorrowingData {
         borrowingDataList.add(new BorrowingData(userName,bookNumber,borrowingDate));
     }
     static void BorBook(String bookNumber, java.sql.Date date){
-        BookData data = BookData.FindBookForNum(bookNumber);
+        BookData data = Data.FindBookForNum(bookNumber);
         if (data != null) {
             data.ChangeborrowingSituation("已借出");
             Data.UpDataBook(bookNumber,"已借出");
@@ -44,7 +44,7 @@ public class BorrowingData {
         }
     }
     static void ReBorBook(String bookNumber){
-        BookData data = BookData.FindBookForNum(bookNumber);
+        BookData data = Data.FindBookForNum(bookNumber);
         if(data != null){
             data.ChangeborrowingSituation("未借出");
             Data.UpDataBook(bookNumber,"未借出");
@@ -62,7 +62,7 @@ public class BorrowingData {
         Object[][] table = Data.GetBorrDataTable(userName,Data.BorrDataType.UserName);
         for(Object[] borrData : table){
             borrData[0] = borrData[1];
-            borrData[1] = Objects.requireNonNull(BookData.FindBookForNum(borrData[1].toString())).GetBookName();
+            borrData[1] = Objects.requireNonNull(Data.FindBookForNum(borrData[1].toString())).GetBookName();
         }
         return table;
     }

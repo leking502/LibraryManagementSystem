@@ -13,11 +13,6 @@ public class Data {
     static final String USER = "root";
     static final String PASS = "123456";
     //加载数据
-    public enum ReturnType{
-        BookData,
-        UserData,
-        BorrowingData,
-    }
     public enum BookDataType{
         BookNumber,
         CallNumber,
@@ -55,6 +50,7 @@ public class Data {
             }
             ResultSet rsBook = stmt.executeQuery(bookDataSQL);
             List<Object[]> table = new ArrayList<>();
+            int count = 0;
             while (rsBook.next()){
                 // 通过字段检索
                 String bookNumber  = rsBook.getString("BookNumber");
@@ -77,7 +73,9 @@ public class Data {
                 bookData[7] = ISBN;
                 bookData[8] = borrowingSituation;
                 table.add(bookData);
+                count++;
             }
+            BookData.bookTotal = count;
             rsBook.close();
             stmt.close();
             conn.close();
@@ -174,42 +172,22 @@ public class Data {
         return new Object[0][0];
     }
 
-    static void LoadData(){
+    static BookData FindBookForNum(String bookNumber_){
         Connection conn;
         Statement stmt;
-
         try {
-            //调用Class.forName()方法加载驱动程序
             Class.forName(JDBC_DRIVER);
-            //调用DriverManager对象的getConnection()方法，获得一个Connection对象
             conn = DriverManager.getConnection(DB_URL,USER,PASS);
-            //创建一个Statement对象
             stmt = conn.createStatement();
-
-
-            String userDataSQL;
             String bookDataSQL;
-            String borDataSQL;
-            userDataSQL = "SELECT UserName, Password, Jurisdiction, BorrowingCardPeriod from userdata";
-            bookDataSQL = "SELECT BookNumber,CallNumber,CollectionPlace,BookName,ResponsiblePerson,Press,LendingDate,ISBN,BorrowingSituation from bookdata";
-            borDataSQL = "SELECT UserName, BookNumber,BorrowingDate from borrowingdata";
-            ResultSet rsUser = stmt.executeQuery(userDataSQL);
-            //加载用户数据
-            while(rsUser.next()){
-                // 通过字段检索
-                String userName  = rsUser.getString("UserName");
-                String passWorld = rsUser.getString("Password");
-                String jurisdiction = rsUser.getString("Jurisdiction");
-                String borrowingCardPeriod = rsUser.getString("BorrowingCardPeriod");
-
-                UserData.AddUser(userName,passWorld,jurisdiction,borrowingCardPeriod);
-
-            }
-            rsUser.close();
-            //加载书本数据
+            bookDataSQL = "SELECT BookNumber,CallNumber,CollectionPlace,BookName,ResponsiblePerson,Press,LendingDate,ISBN,BorrowingSituation from bookdata where "+
+            "BookNUmber = " + "'"+bookNumber_+"'";
             ResultSet rsBook = stmt.executeQuery(bookDataSQL);
+            BookData bookData = null;
             while (rsBook.next()){
-                // 通过字段检索
+                if(bookData != null){
+                    return bookData;
+                }
                 String bookNumber  = rsBook.getString("BookNumber");
                 String callNumber = rsBook.getString("CallNumber");
                 String collectionPlace = rsBook.getString("CollectionPlace");
@@ -220,29 +198,13 @@ public class Data {
                 String ISBN = rsBook.getString("ISBN");
                 String borrowingSituation = rsBook.getString("BorrowingSituation");
 
-                // 输出数据
-
-
-
-
-                BookData.AddBook(bookNumber,callNumber,collectionPlace,bookName,responsiblePerson,press,lendingDate,ISBN,borrowingSituation);
+                bookData = new BookData(bookNumber,callNumber,collectionPlace,bookName,responsiblePerson,press,lendingDate,ISBN,borrowingSituation);
             }
+
             rsBook.close();
-
-            ResultSet rsBorrowing = stmt.executeQuery(borDataSQL);
-            while (rsBorrowing.next()){
-                // 通过字段检索
-                String userName  = rsBorrowing.getString("UserName");
-                String bookNumber = rsBorrowing.getString("BookNumber");
-                Date borrowingDate = rsBorrowing.getDate("BorrowingDate");
-                // 输出数据
-                BorrowingData.AddBorrowingData(userName,bookNumber,borrowingDate);
-            }
-            rsBorrowing.close();
-
             stmt.close();
             conn.close();
-
+            return bookData;
         } catch (SQLException throwable) {
             System.out.println("无法连接数据库");
             throwable.printStackTrace();
@@ -250,20 +212,43 @@ public class Data {
             System.out.println("找不到MySQL驱动!");
             e.printStackTrace();
         }
+        return null;
     }
-    static void UpData(){
-        DelData();
-        LoadData();
-        if(!CheckMainUser(UserData.GetMainUserData().GetUserName())){
-            MainWindow.Despose();
-            JOptionPane.showMessageDialog(null,"你的账号已删除");
+    static UserData FindUser(String userName_){
+        Connection conn;
+        Statement stmt;
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.createStatement();
+            String userDataSQL;
+            userDataSQL = "SELECT UserName, Password, Jurisdiction, BorrowingCardPeriod from userdata where UserName = "+"'"+userName_+"'";
+            ResultSet rsUser = stmt.executeQuery(userDataSQL);
+            UserData userData = null;
+            while (rsUser.next()) {
+                if(userData != null){
+                    return userData;
+                }
+                String userName = rsUser.getString("UserName");
+                String passWorld = rsUser.getString("Password");
+                String jurisdiction = rsUser.getString("Jurisdiction");
+                String borrowingCardPeriod = rsUser.getString("BorrowingCardPeriod");
+                userData = new UserData(userName,passWorld,jurisdiction,borrowingCardPeriod);
+            }
+            rsUser.close();
+            stmt.close();
+            conn.close();
+            return userData;
+        } catch (SQLException throwable) {
+            System.out.println("无法连接数据库");
+            throwable.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.out.println("找不到MySQL驱动!");
+            e.printStackTrace();
         }
+        return null;
     }
-    static void DelData(){
-        BookData.DelData();
-        UserData.DelData();
-        BorrowingData.DelData();
-    }
+
     static void InsBookData(String callNumber, String collectionPlace, String bookName, String responsiblePerson, String press, String lendingDate, String ISBN){
         Date date = new Date();
         int bookNumber = Math.abs ((bookName + lendingDate +  responsiblePerson + press + lendingDate+date.toString()).hashCode());
@@ -290,7 +275,6 @@ public class Data {
             pstmt.setString(9,"未借出");
             pstmt.executeUpdate();
 
-            BookData.AddBook(Integer.toString(bookNumber),callNumber,collectionPlace,bookName,responsiblePerson,press,lendingDate,ISBN,"未借出");
             pstmt.close();
             conn.close();
         } catch (SQLException e) {
@@ -318,7 +302,6 @@ public class Data {
             pstmt.setString(5, "正常");
             pstmt.executeUpdate();
 
-            UserData.AddUser(userName,userPassword,Jurisdiction,"正常");
             pstmt.close();
             conn.close();
         } catch (SQLException e) {
@@ -326,7 +309,7 @@ public class Data {
         }
     }
     static void InsBorData(String userName,String bookNumber,java.sql.Date date){
-        Connection conn = null;
+        Connection conn;
         PreparedStatement pstmt;
         try {
             //调用DriverManager对象的getConnection()方法，获得一个Connection对象
@@ -347,7 +330,6 @@ public class Data {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        BorrowingData.AddBorrowingData(userName,bookNumber,date);
     }
     static void DelBookData(String bookNumber){
 
@@ -363,8 +345,6 @@ public class Data {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        BookData.DelBook(bookNumber);
-
     }
     static void DelUserData(String userName){
         String sql = "delete from userdata where UserName='" + userName + "'";
@@ -379,7 +359,6 @@ public class Data {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        UserData.DelUser(userName);
     }
     static void DelBorData(String bookNumber){
         String sql = "delete from borrowingdata where BookNumber='" + bookNumber + "'";
@@ -393,7 +372,6 @@ public class Data {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        BorrowingData.DelBorrowingData(bookNumber);
     }
     static void UpDataBook(String bookNumber,String type){
 
@@ -410,31 +388,12 @@ public class Data {
         }
     }
 
-    static boolean CheckMainUser(String userName){
-        List<UserData> list = UserData.GetUserDataList();
-        if(list != null){
-            for(UserData userData : list){
-                if(Objects.equals(userData.GetUserName(), userName)){
-                    return true;
-                }
-            }
+    static void SetMainUser(String name){
+        UserData userData = FindUser(name);
+        if(userData == null){
+            System.out.println("用户不存在");
+            return;
         }
-        return false;
-    }
-
-
-    static UserData SetMainUser(String name){
-        for(int i = 0 ;i<UserData.GetUserDataList().size();i++){
-            if(Objects.equals(UserData.GetUserDataList().get(i).GetUserName(), name)){
-                System.out.println("找到用户");
-                return UserData.LoadMainUserData(
-                        UserData.GetUserDataList().get(i).GetUserName(),
-                        UserData.GetUserDataList().get(i).GetUserPassword(),
-                        UserData.GetUserDataList().get(i).GetUserJurisdiction(),
-                        UserData.GetUserDataList().get(i).GetUserBorrowingCardPeriod());
-            }
-        }
-        System.out.println("用户不存在");
-        return null;
+        UserData.SetMainUserData(userData);
     }
 }

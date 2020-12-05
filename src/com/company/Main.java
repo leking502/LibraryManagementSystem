@@ -26,7 +26,6 @@ public class Main {
         {
             //TODO exception
         }
-        Data.LoadData();
 
         LoginWindow loginWindow = new LoginWindow();
         loginWindow.ShowWindow();

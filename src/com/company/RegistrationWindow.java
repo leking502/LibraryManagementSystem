@@ -20,7 +20,8 @@ public class RegistrationWindow {
                 String password = userPassword.getText();
                 if(account.trim() == "" || password.trim() == "" )
                     return;
-                if(Data.SetMainUser(account) != null){
+                UserData userData = Data.FindUser(account);
+                if(userData != null){
                     JOptionPane.showMessageDialog(null,"该账号已存在");
                     return;
                 }
