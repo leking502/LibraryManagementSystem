@@ -9,7 +9,7 @@ import java.util.Date;
 
 public class Data {
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    static final String DB_URL = "jdbc:mysql://localhost:3306/librarydata?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    static final String DB_URL = "jdbc:mysql://localhost:3306/leking?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     static final String USER = "root";
     static final String PASS = "123456";
     //加载数据
@@ -84,10 +84,11 @@ public class Data {
                     String userName  = rsBorrowing.getString("UserName");
                     String bookNumber = rsBorrowing.getString("BookNumber");
                     Date borrowingDate = rsBorrowing.getDate("BorrowingDate");
-                    Object[] BorrowingData = new Object[3];
-                    BorrowingData[0] = userName;
-                    BorrowingData[1] = bookNumber;
-                    BorrowingData[2] = borrowingDate;
+                    Object[] borrowingData = new Object[3];
+                    borrowingData[0] = userName;
+                    borrowingData[1] = bookNumber;
+                    borrowingData[2] = borrowingDate;
+                    table.add(borrowingData);
                 }
                 rsBorrowing.close();
                 return table.toArray(Object[][]::new);

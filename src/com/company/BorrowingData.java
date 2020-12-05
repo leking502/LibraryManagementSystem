@@ -60,10 +60,15 @@ public class BorrowingData {
     }
     static Object[][] GetUserBorTable(String userName){
         Object[][] table = Data.GetTable(Data.ReturnType.BorrowingData);
-        List<Object> list = new ArrayList<>();
-        for(int i = 0; i<table.length;i++){
-            if(table[i][0] == userName){
-                list.add(table[i]);
+        if(table == null){
+            return new Object[0][0];
+        }
+        List<Object[]> list = new ArrayList<>();
+        for (Object[] objects : table) {
+            if (Objects.equals(objects[0].toString(), userName)) {
+                objects[0] = objects[1];
+                objects[1] = Objects.requireNonNull(BookData.FindBookForNum(objects[1].toString())).GetBookName();
+                list.add(objects);
             }
         }
         return list.toArray(Object[][]::new);
