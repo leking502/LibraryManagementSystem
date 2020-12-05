@@ -222,6 +222,10 @@ public class MainWindow {
                 JOptionPane.showMessageDialog(null,"你不可以删除自己");
                 return;
             }
+            if(Data.FindUser(tragetUserM.toString()) == null){
+                JOptionPane.showMessageDialog(null,"该用户不存在");
+                return;
+            }
             JOptionPane.showMessageDialog(null,"删除了账号:"+ tragetUserM.toString());
 
             Object[][] table = BorrowingData.GetUserBorTable(tragetUserM.toString());
@@ -235,6 +239,10 @@ public class MainWindow {
         });
         delBookButtonM.addActionListener(e -> {
             if(tragetBookM == null){
+                return;
+            }
+            if(Data.FindBookForNum(tragetBookM.toString()) == null){
+                JOptionPane.showMessageDialog(null,"该书不存在");
                 return;
             }
             JOptionPane.showMessageDialog(null,"删除了编号为:"+ tragetBookM.toString()+"的图书");
@@ -285,6 +293,7 @@ public class MainWindow {
         borTableA.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+
 
 
                 int row = borTableA.rowAtPoint(e.getPoint());
