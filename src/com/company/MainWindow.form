@@ -81,7 +81,7 @@
                       <text value="刷新"/>
                     </properties>
                   </component>
-                  <component id="a240b" class="javax.swing.JRadioButton" binding="索书号RadioButton" default-binding="true">
+                  <component id="a240b" class="javax.swing.JRadioButton" binding="callNumRadioButton" default-binding="true">
                     <constraints>
                       <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -89,7 +89,7 @@
                       <text value="索书号"/>
                     </properties>
                   </component>
-                  <component id="305cd" class="javax.swing.JRadioButton" binding="藏书地RadioButton" default-binding="true">
+                  <component id="305cd" class="javax.swing.JRadioButton" binding="collPlaRadioButton" default-binding="true">
                     <constraints>
                       <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -97,7 +97,7 @@
                       <text value="藏书地"/>
                     </properties>
                   </component>
-                  <component id="5e98d" class="javax.swing.JRadioButton" binding="书名RadioButton" default-binding="true">
+                  <component id="5e98d" class="javax.swing.JRadioButton" binding="bookNameRadioButton" default-binding="true">
                     <constraints>
                       <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -121,7 +121,7 @@
                       <text value="搜索方式"/>
                     </properties>
                   </component>
-                  <component id="b09a3" class="javax.swing.JRadioButton" binding="责任人RadioButton" default-binding="true">
+                  <component id="b09a3" class="javax.swing.JRadioButton" binding="rPeRadioButton" default-binding="true">
                     <constraints>
                       <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -129,7 +129,7 @@
                       <text value="责任人"/>
                     </properties>
                   </component>
-                  <component id="833ec" class="javax.swing.JRadioButton" binding="出版社RadioButton" default-binding="true">
+                  <component id="833ec" class="javax.swing.JRadioButton" binding="proRadioButton" default-binding="true">
                     <constraints>
                       <grid row="1" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -137,7 +137,7 @@
                       <text value="出版社"/>
                     </properties>
                   </component>
-                  <component id="35ce9" class="javax.swing.JRadioButton" binding="出版年份RadioButton" default-binding="true">
+                  <component id="35ce9" class="javax.swing.JRadioButton" binding="dateRadioButton" default-binding="true">
                     <constraints>
                       <grid row="1" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                     </constraints>

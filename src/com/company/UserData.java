@@ -1,10 +1,5 @@
 package com.company;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class UserData {
     private static UserData mainUserData;

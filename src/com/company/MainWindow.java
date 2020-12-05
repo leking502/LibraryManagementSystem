@@ -55,12 +55,12 @@ public class MainWindow {
     private JTextField pressTe;
     private JTextField lendingDateTe;
     private JTextField ISBNTe;
-    private JRadioButton 索书号RadioButton;
-    private JRadioButton 藏书地RadioButton;
-    private JRadioButton 书名RadioButton;
-    private JRadioButton 责任人RadioButton;
-    private JRadioButton 出版社RadioButton;
-    private JRadioButton 出版年份RadioButton;
+    private JRadioButton callNumRadioButton;
+    private JRadioButton collPlaRadioButton;
+    private JRadioButton bookNameRadioButton;
+    private JRadioButton rPeRadioButton;
+    private JRadioButton proRadioButton;
+    private JRadioButton dateRadioButton;
     private JRadioButton ISBNRadioButton;
     private Object tragetBookA;
     private Object tragetBookM;
@@ -140,7 +140,7 @@ public class MainWindow {
     }
     public MainWindow() {
 
-        书名RadioButton.setSelected(true);
+        bookNameRadioButton.setSelected(true);
         BookTableUpdata("", bookTableA);
         UserTableUpdata("", userTableM);
         BookTableUpdata("", bookTableM);
@@ -345,17 +345,17 @@ public class MainWindow {
         if(field == ""){
             tabalData = Data.GetBookDataTable("",null);
         }else {
-            if(索书号RadioButton.isSelected()){
+            if(callNumRadioButton.isSelected()){
                 tabalData = Data.GetBookDataTable(field,Data.BookDataType.CallNumber);
-            }else if(藏书地RadioButton.isSelected()){
+            }else if(collPlaRadioButton.isSelected()){
                 tabalData = Data.GetBookDataTable(field,Data.BookDataType.CollectionPlace);
-            } else if (书名RadioButton.isSelected()) {
+            } else if (bookNameRadioButton.isSelected()) {
                 tabalData = Data.GetBookDataTable(field,Data.BookDataType.BookName);
-            } else if (责任人RadioButton.isSelected()) {
+            } else if (rPeRadioButton.isSelected()) {
                 tabalData = Data.GetBookDataTable(field,Data.BookDataType.ResponsiblePerson);
-            } else if (出版社RadioButton.isSelected()) {
+            } else if (proRadioButton.isSelected()) {
                 tabalData = Data.GetBookDataTable(field,Data.BookDataType.Press);
-            } else if (出版年份RadioButton.isSelected()) {
+            } else if (dateRadioButton.isSelected()) {
                 tabalData = Data.GetBookDataTable(field,Data.BookDataType.LendingDate);
             } else if (ISBNRadioButton.isSelected()) {
                 tabalData = Data.GetBookDataTable(field,Data.BookDataType.ISBN);

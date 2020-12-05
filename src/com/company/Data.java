@@ -1,11 +1,9 @@
 package com.company;
 
-import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.Date;
+import java.util.List;
 
 public class Data {
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
@@ -144,7 +142,7 @@ public class Data {
                 borDataSQL = "SELECT UserName, BookNumber,BorrowingDate from borrowingdata";
             }else {
                 borDataSQL = "SELECT UserName, BookNumber,BorrowingDate from borrowingdata where " +
-                "locate('"+ condition +"'," + type.toString() +") != 0";;
+                "locate('"+ condition +"'," + type.toString() +") != 0";
             }
             ResultSet rsBorrowing = stmt.executeQuery(borDataSQL);
             List<Object[]> table = new ArrayList<>();
@@ -252,7 +250,7 @@ public class Data {
     static void InsBookData(String callNumber, String collectionPlace, String bookName, String responsiblePerson, String press, String lendingDate, String ISBN){
         Date date = new Date();
         int bookNumber = Math.abs ((bookName + lendingDate +  responsiblePerson + press + lendingDate+date.toString()).hashCode());
-        Connection conn = null;
+        Connection conn;
         PreparedStatement pstmt;
 
         try {
@@ -282,7 +280,7 @@ public class Data {
         }
     }
     static void InsUserData(String userName , String userPassword, String Jurisdiction){
-        Connection conn = null;
+        Connection conn;
         int userNumber = Math.abs ((userName + userPassword).hashCode());
         PreparedStatement pstmt;
 
@@ -337,7 +335,7 @@ public class Data {
         PreparedStatement pstmt;
         try {
             Connection conn = DriverManager.getConnection(DB_URL,USER,PASS);
-            pstmt = (PreparedStatement) conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
             pstmt.executeUpdate();
 
             pstmt.close();
@@ -351,7 +349,7 @@ public class Data {
         PreparedStatement pstmt;
         try {
             Connection conn = DriverManager.getConnection(DB_URL,USER,PASS);
-            pstmt = (PreparedStatement) conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
             pstmt.executeUpdate();
 
             pstmt.close();
@@ -365,7 +363,7 @@ public class Data {
         PreparedStatement pstmt;
         try {
             Connection conn = DriverManager.getConnection(DB_URL,USER,PASS);
-            pstmt = (PreparedStatement) conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
             pstmt.executeUpdate();
             pstmt.close();
             conn.close();
@@ -379,7 +377,7 @@ public class Data {
         PreparedStatement pstmt;
         try {
             Connection conn = DriverManager.getConnection(DB_URL,USER,PASS);
-            pstmt = (PreparedStatement) conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
             pstmt.executeUpdate();
             pstmt.close();
             conn.close();

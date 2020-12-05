@@ -1,9 +1,5 @@
 package com.company;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 public class BookData {
     public static int bookTotal = 0;
     private String bookNumber;

@@ -17,23 +17,10 @@ public class BorrowingData {
     public String GetBookNumber(){ return bookNumber;}
     public Date GetBorrowingDate() { return borrowingDate; }
 
-    public static void DelData(){
-        borrowingDataList = null;
-    }
-
     public BorrowingData(String userName, String bookNumber, Date borrowingDate) {
         this.userName = userName;
         this.bookNumber = bookNumber;
         this.borrowingDate = borrowingDate;
-    }
-
-    static void AddBorrowingData(String userName, String bookNumber, Date borrowingDate){
-        if(borrowingDataList == null){
-            borrowingDataList = new ArrayList<>();
-            borrowingDataList.add(new BorrowingData(userName,bookNumber,borrowingDate));
-            return;
-        }
-        borrowingDataList.add(new BorrowingData(userName,bookNumber,borrowingDate));
     }
     static void BorBook(String bookNumber, java.sql.Date date){
         BookData data = Data.FindBookForNum(bookNumber);
@@ -50,13 +37,6 @@ public class BorrowingData {
             Data.UpDataBook(bookNumber,"未借出");
             Data.DelBorData(bookNumber);
         }
-    }
-
-    static void DelBorrowingData(String bookNumber){
-        if(borrowingDataList == null){
-            return;
-        }
-        borrowingDataList.removeIf(borrowingData -> Objects.equals(borrowingData.bookNumber,bookNumber));
     }
     static Object[][] GetUserBorTable(String userName){
         Object[][] table = Data.GetBorrDataTable(userName,Data.BorrDataType.UserName);
