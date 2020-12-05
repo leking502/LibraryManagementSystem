@@ -7,6 +7,7 @@ public class Main {
 
     public static void main(String[] args)
     {
+        Data.LoadSql();
         try
         {
             BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.osLookAndFeelDecorated;

@@ -7,9 +7,26 @@ import java.util.List;
 
 public class Data {
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    static final String DB_URL = "jdbc:mysql://localhost:3306/librarydata?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    static final String DB_URL = "jdbc:mysql://222.186.174.33:27774/librarydata?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     static final String USER = "root";
     static final String PASS = "123456";
+
+    static public Connection conn;
+
+    static void LoadSql(){
+
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL,USER,PASS);
+        } catch (ClassNotFoundException e) {
+            System.out.println("找不到数据库驱动");
+            e.printStackTrace();
+        } catch (SQLException throwables) {
+            System.out.println("数据库连接失败");
+            throwables.printStackTrace();
+        }
+
+    }
     //加载数据
     public enum BookDataType{
         BookNumber,
@@ -33,11 +50,8 @@ public class Data {
         BorrowingDate
     }
     static Object[][] GetBookDataTable(String condition, BookDataType type){
-        Connection conn;
         Statement stmt;
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL,USER,PASS);
             stmt = conn.createStatement();
             String bookDataSQL;
             if(type == null){
@@ -76,23 +90,16 @@ public class Data {
             BookData.bookTotal = count;
             rsBook.close();
             stmt.close();
-            conn.close();
             return table.toArray(Object[][]::new);
         } catch (SQLException throwable) {
             System.out.println("无法连接数据库");
             throwable.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            System.out.println("找不到MySQL驱动!");
-            e.printStackTrace();
         }
         return new Object[0][0];
     }
     static Object[][] GetUserDataTable(String condition,UserDataType type) {
-        Connection conn;
         Statement stmt;
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
             stmt = conn.createStatement();
             String userDataSQL;
             if(type == null){
@@ -119,23 +126,16 @@ public class Data {
             rsUser.close();
 
             stmt.close();
-            conn.close();
             return table.toArray(Object[][]::new);
         } catch (SQLException throwable) {
             System.out.println("无法连接数据库");
             throwable.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            System.out.println("找不到MySQL驱动!");
-            e.printStackTrace();
         }
         return new Object[0][0];
     }
     static Object[][] GetBorrDataTable(String condition, BorrDataType type){
-        Connection conn;
         Statement stmt;
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL,USER,PASS);
             stmt = conn.createStatement();
             String borDataSQL;
             if (type == null){
@@ -158,24 +158,17 @@ public class Data {
             }
             rsBorrowing.close();
             stmt.close();
-            conn.close();
             return table.toArray(Object[][]::new);
         } catch (SQLException throwable) {
             System.out.println("无法连接数据库");
             throwable.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            System.out.println("找不到MySQL驱动!");
-            e.printStackTrace();
         }
         return new Object[0][0];
     }
 
     static BookData FindBookForNum(String bookNumber_){
-        Connection conn;
         Statement stmt;
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL,USER,PASS);
             stmt = conn.createStatement();
             String bookDataSQL;
             bookDataSQL = "SELECT BookNumber,CallNumber,CollectionPlace,BookName,ResponsiblePerson,Press,LendingDate,ISBN,BorrowingSituation from bookdata where "+
@@ -201,23 +194,16 @@ public class Data {
 
             rsBook.close();
             stmt.close();
-            conn.close();
             return bookData;
         } catch (SQLException throwable) {
             System.out.println("无法连接数据库");
             throwable.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            System.out.println("找不到MySQL驱动!");
-            e.printStackTrace();
         }
         return null;
     }
     static UserData FindUser(String userName_){
-        Connection conn;
         Statement stmt;
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
             stmt = conn.createStatement();
             String userDataSQL;
             userDataSQL = "SELECT UserName, Password, Jurisdiction, BorrowingCardPeriod from userdata where UserName = "+"'"+userName_+"'";
@@ -235,14 +221,10 @@ public class Data {
             }
             rsUser.close();
             stmt.close();
-            conn.close();
             return userData;
         } catch (SQLException throwable) {
             System.out.println("无法连接数据库");
             throwable.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            System.out.println("找不到MySQL驱动!");
-            e.printStackTrace();
         }
         return null;
     }
@@ -250,12 +232,10 @@ public class Data {
     static void InsBookData(String callNumber, String collectionPlace, String bookName, String responsiblePerson, String press, String lendingDate, String ISBN){
         Date date = new Date();
         int bookNumber = Math.abs ((bookName + lendingDate +  responsiblePerson + press + lendingDate+date.toString()).hashCode());
-        Connection conn;
         PreparedStatement pstmt;
 
         try {
             //调用DriverManager对象的getConnection()方法，获得一个Connection对象
-            conn = DriverManager.getConnection(DB_URL,USER,PASS);
             //创建一个Statement对象
 
 
@@ -274,19 +254,16 @@ public class Data {
             pstmt.executeUpdate();
 
             pstmt.close();
-            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
     static void InsUserData(String userName , String userPassword, String Jurisdiction){
-        Connection conn;
         int userNumber = Math.abs ((userName + userPassword).hashCode());
         PreparedStatement pstmt;
 
         try {
             //调用DriverManager对象的getConnection()方法，获得一个Connection对象
-            conn = DriverManager.getConnection(DB_URL,USER,PASS);
             //创建一个Statement对象
 
 
@@ -301,17 +278,14 @@ public class Data {
             pstmt.executeUpdate();
 
             pstmt.close();
-            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
     static void InsBorData(String userName,String bookNumber,java.sql.Date date){
-        Connection conn;
         PreparedStatement pstmt;
         try {
             //调用DriverManager对象的getConnection()方法，获得一个Connection对象
-            conn = DriverManager.getConnection(DB_URL,USER,PASS);
             //创建一个Statement对象
 
             String userInsSQL;
@@ -324,7 +298,6 @@ public class Data {
             pstmt.executeUpdate();
 
             pstmt.close();
-            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -334,12 +307,10 @@ public class Data {
         String sql = "delete from bookdata where BookNumber='" + bookNumber + "'";
         PreparedStatement pstmt;
         try {
-            Connection conn = DriverManager.getConnection(DB_URL,USER,PASS);
             pstmt = conn.prepareStatement(sql);
             pstmt.executeUpdate();
 
             pstmt.close();
-            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -348,12 +319,10 @@ public class Data {
         String sql = "delete from userdata where UserName='" + userName + "'";
         PreparedStatement pstmt;
         try {
-            Connection conn = DriverManager.getConnection(DB_URL,USER,PASS);
             pstmt = conn.prepareStatement(sql);
             pstmt.executeUpdate();
 
             pstmt.close();
-            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -362,11 +331,9 @@ public class Data {
         String sql = "delete from borrowingdata where BookNumber='" + bookNumber + "'";
         PreparedStatement pstmt;
         try {
-            Connection conn = DriverManager.getConnection(DB_URL,USER,PASS);
             pstmt = conn.prepareStatement(sql);
             pstmt.executeUpdate();
             pstmt.close();
-            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -376,11 +343,9 @@ public class Data {
         String sql = "update bookdata set BorrowingSituation='" + type + "' where BookNumber='" + bookNumber + "'";
         PreparedStatement pstmt;
         try {
-            Connection conn = DriverManager.getConnection(DB_URL,USER,PASS);
             pstmt = conn.prepareStatement(sql);
             pstmt.executeUpdate();
             pstmt.close();
-            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
