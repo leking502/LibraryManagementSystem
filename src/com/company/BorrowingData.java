@@ -59,18 +59,11 @@ public class BorrowingData {
         borrowingDataList.removeIf(borrowingData -> Objects.equals(borrowingData.bookNumber,bookNumber));
     }
     static Object[][] GetUserBorTable(String userName){
-        Object[][] table = Data.GetTable(Data.ReturnType.BorrowingData);
-        if(table == null){
-            return new Object[0][0];
+        Object[][] table = Data.GetBorrDataTable(userName,Data.BorrDataType.UserName);
+        for(Object[] borrData : table){
+            borrData[0] = borrData[1];
+            borrData[1] = Objects.requireNonNull(BookData.FindBookForNum(borrData[1].toString())).GetBookName();
         }
-        List<Object[]> list = new ArrayList<>();
-        for (Object[] objects : table) {
-            if (Objects.equals(objects[0].toString(), userName)) {
-                objects[0] = objects[1];
-                objects[1] = Objects.requireNonNull(BookData.FindBookForNum(objects[1].toString())).GetBookName();
-                list.add(objects);
-            }
-        }
-        return list.toArray(Object[][]::new);
+        return table;
     }
 }

@@ -9,7 +9,7 @@ import java.util.Date;
 
 public class Data {
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    static final String DB_URL = "jdbc:mysql://localhost:3306/leking?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    static final String DB_URL = "jdbc:mysql://localhost:3306/librarydata?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     static final String USER = "root";
     static final String PASS = "123456";
     //加载数据
@@ -18,83 +18,152 @@ public class Data {
         UserData,
         BorrowingData,
     }
-    static Object[][] GetTable(ReturnType returnType){
+    public enum BookDataType{
+        BookNumber,
+        CallNumber,
+        CollectionPlace,
+        BookName,
+        ResponsiblePerson,
+        Press,LendingDate,
+        ISBN,
+        BorrowingSituation
+    }
+    public enum UserDataType{
+        UserName,
+        Password,
+        Jurisdiction,
+        BorrowingCardPeriod
+    }
+    public enum BorrDataType {
+        UserName,
+        BookNumber,
+        BorrowingDate
+    }
+    static Object[][] GetBookDataTable(String condition, BookDataType type){
         Connection conn;
         Statement stmt;
         try {
             Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL,USER,PASS);
             stmt = conn.createStatement();
-            String userDataSQL;
             String bookDataSQL;
-            String borDataSQL;
-            userDataSQL = "SELECT UserName, Password, Jurisdiction, BorrowingCardPeriod from userdata";
-            bookDataSQL = "SELECT BookNumber,CallNumber,CollectionPlace,BookName,ResponsiblePerson,Press,LendingDate,ISBN,BorrowingSituation from bookdata";
-            borDataSQL = "SELECT UserName, BookNumber,BorrowingDate from borrowingdata";
-            if(returnType == ReturnType.UserData){
-                ResultSet rsUser = stmt.executeQuery(userDataSQL);
-                List<Object[]> table = new ArrayList<>();
-                while(rsUser.next()){
-                    // 通过字段检索
-                    String userName  = rsUser.getString("UserName");
-                    String passWorld = rsUser.getString("Password");
-                    String jurisdiction = rsUser.getString("Jurisdiction");
-                    String borrowingCardPeriod = rsUser.getString("BorrowingCardPeriod");
-                    Object[] userData = new Object[4];
-                    userData[0] = userName;
-                    userData[1] = passWorld;
-                    userData[2] = jurisdiction;
-                    userData[3] = borrowingCardPeriod;
-                    table.add(userData);
-                }
-                rsUser.close();
-                return table.toArray(Object[][]::new);
-            }else if(returnType == ReturnType.BookData){
-                ResultSet rsBook = stmt.executeQuery(bookDataSQL);
-                List<Object[]> table = new ArrayList<>();
-                while (rsBook.next()){
-                    // 通过字段检索
-                    String bookNumber  = rsBook.getString("BookNumber");
-                    String callNumber = rsBook.getString("CallNumber");
-                    String collectionPlace = rsBook.getString("CollectionPlace");
-                    String bookName = rsBook.getString("BookName");
-                    String responsiblePerson = rsBook.getString("ResponsiblePerson");
-                    String press = rsBook.getString("Press");
-                    String lendingDate = rsBook.getString("LendingDate");
-                    String ISBN = rsBook.getString("ISBN");
-                    String borrowingSituation = rsBook.getString("BorrowingSituation");
-                    Object[] bookData = new Object[9];
-                    bookData[0] = bookNumber;
-                    bookData[1] = callNumber;
-                    bookData[2] = collectionPlace;
-                    bookData[3] = bookName;
-                    bookData[4] = responsiblePerson;
-                    bookData[5] = press;
-                    bookData[6] = lendingDate;
-                    bookData[7] = ISBN;
-                    bookData[8] = borrowingSituation;
-                    table.add(bookData);
-                }
-                rsBook.close();
-                return table.toArray(Object[][]::new);
-            }else if(returnType == ReturnType.BorrowingData){
-                ResultSet rsBorrowing = stmt.executeQuery(borDataSQL);
-                List<Object[]> table = new ArrayList<>();
-                while (rsBorrowing.next()){
-                    String userName  = rsBorrowing.getString("UserName");
-                    String bookNumber = rsBorrowing.getString("BookNumber");
-                    Date borrowingDate = rsBorrowing.getDate("BorrowingDate");
-                    Object[] borrowingData = new Object[3];
-                    borrowingData[0] = userName;
-                    borrowingData[1] = bookNumber;
-                    borrowingData[2] = borrowingDate;
-                    table.add(borrowingData);
-                }
-                rsBorrowing.close();
-                return table.toArray(Object[][]::new);
+            if(type == null){
+                bookDataSQL = "SELECT BookNumber,CallNumber,CollectionPlace,BookName,ResponsiblePerson,Press,LendingDate,ISBN,BorrowingSituation from bookdata";
+            }else {
+                bookDataSQL = "SELECT BookNumber,CallNumber,CollectionPlace,BookName,ResponsiblePerson,Press,LendingDate,ISBN,BorrowingSituation from bookdata where "+
+                        "locate('"+ condition +"'," + type.toString() +") != 0";
             }
+            ResultSet rsBook = stmt.executeQuery(bookDataSQL);
+            List<Object[]> table = new ArrayList<>();
+            while (rsBook.next()){
+                // 通过字段检索
+                String bookNumber  = rsBook.getString("BookNumber");
+                String callNumber = rsBook.getString("CallNumber");
+                String collectionPlace = rsBook.getString("CollectionPlace");
+                String bookName = rsBook.getString("BookName");
+                String responsiblePerson = rsBook.getString("ResponsiblePerson");
+                String press = rsBook.getString("Press");
+                String lendingDate = rsBook.getString("LendingDate");
+                String ISBN = rsBook.getString("ISBN");
+                String borrowingSituation = rsBook.getString("BorrowingSituation");
+                Object[] bookData = new Object[9];
+                bookData[0] = bookNumber;
+                bookData[1] = callNumber;
+                bookData[2] = collectionPlace;
+                bookData[3] = bookName;
+                bookData[4] = responsiblePerson;
+                bookData[5] = press;
+                bookData[6] = lendingDate;
+                bookData[7] = ISBN;
+                bookData[8] = borrowingSituation;
+                table.add(bookData);
+            }
+            rsBook.close();
             stmt.close();
             conn.close();
+            return table.toArray(Object[][]::new);
+        } catch (SQLException throwable) {
+            System.out.println("无法连接数据库");
+            throwable.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.out.println("找不到MySQL驱动!");
+            e.printStackTrace();
+        }
+        return new Object[0][0];
+    }
+    static Object[][] GetUserDataTable(String condition,UserDataType type) {
+        Connection conn;
+        Statement stmt;
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.createStatement();
+            String userDataSQL;
+            if(type == null){
+                userDataSQL = "SELECT UserName, Password, Jurisdiction, BorrowingCardPeriod from userdata";
+            }else {
+                userDataSQL = "SELECT UserName, Password, Jurisdiction, BorrowingCardPeriod from userdata where " +
+                        "locate('"+ condition +"'," + type.toString() +") != 0";
+            }
+            ResultSet rsUser = stmt.executeQuery(userDataSQL);
+            List<Object[]> table = new ArrayList<>();
+            while (rsUser.next()) {
+                // 通过字段检索
+                String userName = rsUser.getString("UserName");
+                String passWorld = rsUser.getString("Password");
+                String jurisdiction = rsUser.getString("Jurisdiction");
+                String borrowingCardPeriod = rsUser.getString("BorrowingCardPeriod");
+                Object[] userData = new Object[4];
+                userData[0] = userName;
+                userData[1] = passWorld;
+                userData[2] = jurisdiction;
+                userData[3] = borrowingCardPeriod;
+                table.add(userData);
+            }
+            rsUser.close();
+
+            stmt.close();
+            conn.close();
+            return table.toArray(Object[][]::new);
+        } catch (SQLException throwable) {
+            System.out.println("无法连接数据库");
+            throwable.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.out.println("找不到MySQL驱动!");
+            e.printStackTrace();
+        }
+        return new Object[0][0];
+    }
+    static Object[][] GetBorrDataTable(String condition, BorrDataType type){
+        Connection conn;
+        Statement stmt;
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL,USER,PASS);
+            stmt = conn.createStatement();
+            String borDataSQL;
+            if (type == null){
+                borDataSQL = "SELECT UserName, BookNumber,BorrowingDate from borrowingdata";
+            }else {
+                borDataSQL = "SELECT UserName, BookNumber,BorrowingDate from borrowingdata where " +
+                "locate('"+ condition +"'," + type.toString() +") != 0";;
+            }
+            ResultSet rsBorrowing = stmt.executeQuery(borDataSQL);
+            List<Object[]> table = new ArrayList<>();
+            while (rsBorrowing.next()){
+                String userName  = rsBorrowing.getString("UserName");
+                String bookNumber = rsBorrowing.getString("BookNumber");
+                Date borrowingDate = rsBorrowing.getDate("BorrowingDate");
+                Object[] borrowingData = new Object[3];
+                borrowingData[0] = userName;
+                borrowingData[1] = bookNumber;
+                borrowingData[2] = borrowingDate;
+                table.add(borrowingData);
+            }
+            rsBorrowing.close();
+            stmt.close();
+            conn.close();
+            return table.toArray(Object[][]::new);
         } catch (SQLException throwable) {
             System.out.println("无法连接数据库");
             throwable.printStackTrace();

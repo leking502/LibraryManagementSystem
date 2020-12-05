@@ -39,7 +39,7 @@ public class LoginWindow {
         frame.setBounds(800,400,450,300);
         frame.setResizable(false);
         frame.setVisible(true);
-        this.frame = frame;
+        LoginWindow.frame = frame;
     }
     private void Dispose(){
         frame.dispose();

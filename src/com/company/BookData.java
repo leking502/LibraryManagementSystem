@@ -64,6 +64,9 @@ public class BookData {
     public void ChangeborrowingSituation(String borrowingSituation){
         this.borrowingSituation = borrowingSituation;
     }
+
+
+    @Deprecated
     public static Object[][] GetBookTable(){
         if(bookDataList == null){
             return new Object[0][0];
@@ -82,4 +85,5 @@ public class BookData {
         }
         return bookDateTable = date;
     }
+
 }

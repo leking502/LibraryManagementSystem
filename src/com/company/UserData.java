@@ -42,10 +42,10 @@ public class UserData {
     public String GetUserJurisdiction(){return jurisdiction;}
     public String GetUserBorrowingCardPeriod(){return borrowingCardPeriod;}
 
-    public String GetMainUserName(){return mainUserData.userName;}
-    public String GetMainUserPassword(){return mainUserData.password;}
-    public String GetMainUserJurisdiction(){return mainUserData.jurisdiction;}
-    public String GetMainUserBorrowingCardPeriod(){return mainUserData.borrowingCardPeriod;}
+    public static String GetMainUserName(){return mainUserData.userName;}
+    public static String GetMainUserPassword(){return mainUserData.password;}
+    public static String GetMainUserJurisdiction(){return mainUserData.jurisdiction;}
+    public static String GetMainUserBorrowingCardPeriod(){return mainUserData.borrowingCardPeriod;}
 
     public static List<UserData> GetUserDataList(){
         if(userDataList == null)
@@ -63,6 +63,8 @@ public class UserData {
     public static void DelUser(String userName){
         userDataList.removeIf(userData -> Objects.equals(userData.userName, userName));
     }
+
+    @Deprecated
     public static Object[][] GetUserTable(){
         if(userDataList == null){
             return new Object[0][0];
