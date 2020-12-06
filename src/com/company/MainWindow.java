@@ -67,6 +67,14 @@ public class MainWindow {
     private Object tragetUserM;
     private Object tragetRbBookA;
 
+    void CheckMainUser(){
+        if(Data.FindBookForNum(UserData.GetMainUserName()) == null){
+            JOptionPane.showMessageDialog(null,"你的账户已被删除");
+            Despose();
+        }
+
+    }
+
     public void SetTargetNull(){
         tragetBookA = null;
         tragetBookM = null;
@@ -195,7 +203,7 @@ public class MainWindow {
         bookTableA.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-
+                CheckMainUser();
 
                 int row = bookTableA.rowAtPoint(e.getPoint());
                 tragetBookA = bookTableA.getValueAt(row,0);
@@ -206,7 +214,7 @@ public class MainWindow {
         userTableM.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-
+                CheckMainUser();
 
                 int row = userTableM.rowAtPoint(e.getPoint());
                 tragetUserM = userTableM.getValueAt(row,0);
@@ -215,6 +223,7 @@ public class MainWindow {
             }
         });
         delUserButton.addActionListener(e -> {
+            CheckMainUser();
             if(tragetUserM == null){
                 return;
             }
@@ -238,6 +247,7 @@ public class MainWindow {
             UpdataAllTable();
         });
         delBookButtonM.addActionListener(e -> {
+            CheckMainUser();
             if(tragetBookM == null){
                 return;
             }
@@ -259,7 +269,7 @@ public class MainWindow {
         bookTableM.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-
+                CheckMainUser();
 
                 int row = bookTableM.rowAtPoint(e.getPoint());
                 tragetBookM = bookTableM.getValueAt(row,0);
@@ -270,6 +280,7 @@ public class MainWindow {
         tabbedPaneA.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                CheckMainUser();
                 Updata();
                 if(Objects.equals(UserData.GetMainUserJurisdiction(), "用户")&& tabbedPaneA.getSelectedIndex() == 3){
                     tabbedPaneA.setSelectedIndex(0);
@@ -278,6 +289,7 @@ public class MainWindow {
             }
         });
         borBookButton.addActionListener(e -> {
+            CheckMainUser();
             if(tragetBookA == null){
                 return;
             }
@@ -293,7 +305,7 @@ public class MainWindow {
         borTableA.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-
+                CheckMainUser();
 
 
                 int row = borTableA.rowAtPoint(e.getPoint());
@@ -303,10 +315,12 @@ public class MainWindow {
             }
         });
         sBorBookButton.addActionListener(e -> {
+            CheckMainUser();
             BorTableUpdata(textFieldBor.getText().trim(), borTableA);
             textFieldBor.setText("");
         });
         reBorButton.addActionListener(e -> {
+            CheckMainUser();
             if(tragetRbBookA == null){
                 return;
             }
@@ -316,6 +330,7 @@ public class MainWindow {
             UpdataAllTable();
         });
         cancelButtonA.addActionListener(e -> {
+            CheckMainUser();
             UserData.Cancellation();
             Despose();
             LoginWindow loginWindow = new LoginWindow();
@@ -324,19 +339,33 @@ public class MainWindow {
         tabbedPaneA.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                CheckMainUser();
                 Updata();
             }
         });
-        upDataBookA.addActionListener(e -> Updata());
-        upDataBorA.addActionListener(e -> Updata());
+        upDataBookA.addActionListener(e -> {
+            CheckMainUser();
+            Updata();
+        });
+        upDataBorA.addActionListener(e -> {
+            CheckMainUser();
+            Updata();
+        });
         tabbedPaneM.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                CheckMainUser();
                 Updata();
             }
         });
-        upDataUserM.addActionListener(e -> Updata());
-        upDataBookM.addActionListener(e -> Updata());
+        upDataUserM.addActionListener(e -> {
+            CheckMainUser();
+            Updata();
+        });
+        upDataBookM.addActionListener(e -> {
+            CheckMainUser();
+            Updata();
+        });
     }
 
     public void ShowWindow() {
