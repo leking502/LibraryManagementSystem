@@ -68,7 +68,7 @@ public class MainWindow {
     private Object tragetRbBookA;
 
     void CheckMainUser(){
-        if(Data.FindBookForNum(UserData.GetMainUserName()) == null){
+        if(Data.FindUser(UserData.GetMainUserName()) == null){
             JOptionPane.showMessageDialog(null,"你的账户已被删除");
             Despose();
         }

@@ -1,6 +1,8 @@
 package com.company;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 
+import javax.swing.*;
+
 
 public class Main {
 
@@ -20,8 +22,6 @@ public class Main {
 
         LoginWindow loginWindow = new LoginWindow();
         loginWindow.ShowWindow();
-
-
 
         //UserData.LoadMainUserData("admin","admin","管理员","正常");
         //MainWindow mainWindow = new MainWindow();
